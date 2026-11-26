@@ -21,10 +21,10 @@
   <button class="modal-submit-gold" type="submit">دخول</button>
  </form>
  <section id="setup-options" hidden>
-  <label for="api-url">رابط خادم Cloudflare</label><input id="api-url" type="url" placeholder="https://elasal-academy.your-name.workers.dev" dir="ltr">
-  <button class="modal-submit-gold" data-onclick="a1">الاتصال بالخادم</button>
-  <p>النسخ اليومية على السيرفر تتطلب ربط Cloudflare. الوضع المحلي يحفظ على هذا المتصفح فقط، ويعمل النسخ التلقائي أثناء فتح الصفحة.</p>
-  <button class="gold-tool-btn" data-onclick="a2">فتح الوضع المحلي على هذا الجهاز</button>
+  <p id="setup-hint">النسخ اليومية على السيرفر تتطلب ربط Cloudflare. الوضع المحلي يحفظ على هذا المتصفح فقط، ويعمل النسخ التلقائي أثناء فتح الصفحة.</p>
+  <button class="modal-submit-gold" data-onclick="a2">فتح الوضع المحلي على هذا الجهاز</button>
+  <label for="api-url">رابط خادم Cloudflare</label><input id="api-url" type="url" placeholder="https://" dir="ltr">
+  <button id="connect-server-btn" class="gold-tool-btn" data-onclick="a1">الاتصال بالخادم</button>
  </section>
  <button id="change-server-btn" class="gold-tool-btn" data-onclick="a3" hidden>إعداد الاتصال</button>
 </section>

@@ -48,7 +48,6 @@ async function initApp() {
   if (pagesDemo) {
     if(localStorage.getItem('elasal_mode')==='local'){await startLocal();return;}
     showConnectionSettings();
-    $('entry-status').textContent='نسخة GitHub Pages للعرض والتجربة. إدارة الصالة والدخول على Cloudflare.';
     return;
   }
   if (!API_BASE && localStorage.getItem('elasal_mode') === 'local') { await startLocal(); return; }
@@ -63,7 +62,9 @@ async function initApp() {
   }
 }
 function validOrigin(value) {
-  const u = new URL(value);
+  let u;
+  try { u = new URL(value); }
+  catch { throw Error('أدخل رابطًا كاملًا لخادم Cloudflare يبدأ بـ https://.'); }
   if (u.protocol !== 'https:' && !(u.protocol === 'http:' && ['localhost','127.0.0.1'].includes(u.hostname))) throw Error('يلزم رابط HTTPS');
   if (u.username || u.password || u.search || u.hash || (u.pathname !== '/' && u.pathname !== '')) throw Error('أدخل أصل الرابط فقط دون مسار أو بيانات دخول');
   return u.origin;
@@ -71,12 +72,18 @@ function validOrigin(value) {
 function showConnectionSettings() {
   if(token) lock();
   $('app').hidden = true; $('entry-screen').hidden = false; $('login-form').hidden = true; $('setup-options').hidden = false; $('change-server-btn').hidden = true;
-  $('entry-status').textContent = 'اختر طريقة تخزين البيانات'; $('api-url').value = base;
-  if(pagesDemo){$('setup-options').querySelector('button').textContent='فتح النظام على Cloudflare';$('setup-options').querySelector('p').textContent='نسخة Pages للتجربة المحلية ببيانات تجريبية. دخول المدير والحفظ المركزي والنسخ اليومية على Cloudflare.';}
+  $('entry-status').textContent = pagesDemo ? 'نسخة GitHub Pages للعرض والتجربة' : 'اختر طريقة تخزين البيانات';
+  $('api-url').value = base;
+  if (pagesDemo) {
+    $('connect-server-btn').textContent = 'فتح النظام على Cloudflare';
+    $('setup-hint').textContent = 'جرّب الموقع محليًا ببيانات تجريبية. دخول المدير والحفظ المركزي والنسخ اليومية تتطلب خادم Cloudflare منشورًا.';
+  }
 }
 async function connectServer() {
   try {
-    const proposed = validOrigin($('api-url').value.trim());
+    const serverUrl = $('api-url').value.trim();
+    if (!serverUrl) throw Error('أدخل رابط خادم Cloudflare، أو افتح الوضع المحلي لتجربة الموقع.');
+    const proposed = validOrigin(serverUrl);
     // A token is never sent while checking a newly entered server.
     token = ''; base = proposed;
     const h = await api('/api/health'); if (h.service !== 'elasal-academy') throw Error('الرابط لا يشغّل خادم الأكاديمية');
