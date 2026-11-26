@@ -1,9 +1,6 @@
-import './app.js?v=2';
+import './app.js?v=3';
 const actions = {
   a0: function(event) { event.preventDefault(); login() },
-  a1: function(event) { connectServer() },
-  a2: function(event) { startLocal() },
-  a3: function(event) { showConnectionSettings() },
   a4: function(event) { viewLargeImage(this.querySelector('img').src) },
   a5: function(event) { updateManagerPhoto(event) },
   a6: function(event) { openAddMemberModal() },

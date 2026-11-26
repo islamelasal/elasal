@@ -10,7 +10,7 @@
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
     <title>لوحة الإدارة | أكاديمية العسال للملاكمة</title>
     <link rel="stylesheet" href="./assets/base.css?v=2">
-    <link rel="stylesheet" href="./assets/brand.css?v=3">
+    <link rel="stylesheet" href="./assets/brand.css?v=4">
 </head>
 <body>
     <main id="entry-screen" class="site-shell">
@@ -26,24 +26,15 @@
                 <h1>أكاديمية العسال <span>للملاكمة</span></h1>
                 <p class="entry-description">لوحة إدارة المشتركين والحصص والمقبوضات.</p>
                 <form id="login-form" hidden data-onsubmit="a0">
-                    <label for="admin-password">كلمة مرور المدير</label>
+                    <p class="muted" id="initial-password-hint" hidden>اختر كلمة مرور من 12 حرفًا على الأقل لتشفير بيانات الإدارة والنسخ على هذا الجهاز.</p>
+                    <label for="admin-password">كلمة المرور</label>
                     <input id="admin-password" type="password" autocomplete="current-password" required maxlength="256">
-                    <button class="modal-submit-gold" type="submit">دخول</button>
+                    <div id="confirm-password-group" class="form-gold-group" hidden>
+                        <label for="confirm-password">تأكيد كلمة المرور</label>
+                        <input id="confirm-password" type="password" autocomplete="new-password" maxlength="256">
+                    </div>
+                    <button id="unlock-submit" class="modal-submit-gold" type="submit">فتح لوحة الإدارة</button>
                 </form>
-                <div id="setup-options" hidden>
-                    <button class="primary-gold-btn entry-action" type="button" data-onclick="a2">
-                        فتح الوضع المحلي على هذا الجهاز <span aria-hidden="true">←</span>
-                    </button>
-                    <p id="setup-hint">تُحفظ بيانات الوضع المحلي في هذا المتصفح.</p>
-                    <details id="server-options" class="server-options">
-                        <summary>الاتصال بخادم Cloudflare</summary>
-                        <label for="api-url">رابط خادم Cloudflare</label>
-                        <input id="api-url" type="url" placeholder="https://" dir="ltr" aria-describedby="connection-status">
-                        <button id="connect-server-btn" class="gold-tool-btn" type="button" data-onclick="a1">الاتصال بالخادم</button>
-                        <p id="connection-status" role="status"></p>
-                    </details>
-                </div>
-                <button id="change-server-btn" class="gold-tool-btn" type="button" data-onclick="a3" hidden>إعداد الاتصال</button>
             </div>
             <figure class="entry-portrait">
                 <img src="./assets/coach.webp" width="1200" height="900" alt="" fetchpriority="high">
@@ -163,11 +154,18 @@
                     </label>
                     <button class="gold-tool-btn" type="button" data-onclick="a8">إعدادات واتساب</button>
                     <button class="gold-tool-btn" type="button" data-onclick="a12">تحديث البيانات</button>
-                    <button class="gold-tool-btn" type="button" data-settings="connection">التخزين والاتصال</button>
-                    <button id="logout-btn" class="gold-tool-btn" type="button" data-onclick="a13" hidden>تسجيل الخروج</button>
+                    <button class="gold-tool-btn" type="button" data-report>التقارير الشهرية</button>
+                    <button class="gold-tool-btn" type="button" data-password>تغيير كلمة المرور</button>
+                    <button id="logout-btn" class="gold-tool-btn" type="button" data-onclick="a13">قفل اللوحة</button>
                 </div>
             </aside>
         </div>
+        <nav class="admin-mobile-actions" aria-label="أدوات الإدارة السريعة">
+            <a class="gold-tool-btn" href="#members-title">المشتركون</a>
+            <button class="gold-tool-btn" type="button" data-report>الحسابات</button>
+            <button class="gold-tool-btn" type="button" data-onclick="a10">النسخ</button>
+            <button class="gold-tool-btn" type="button" data-onclick="a13">قفل</button>
+        </nav>
     </main>
 
 <!-- نافذة عرض الصورة بحجم كبير -->
@@ -233,11 +231,11 @@
 
             <div id="custom-pkg-box">
                 <div class="form-gold-group"><label for="custom-sessions">عدد الحصص المخصصة</label><input type="number" id="custom-sessions" value="10" min="1" data-oninput="a28"></div>
-                <div class="form-gold-group"><label for="custom-price">السعر الإجمالي المخصص (ج.م)</label><input type="number" id="custom-price" value="1500" min="0" data-oninput="a29"></div>
+                <div class="form-gold-group"><label for="custom-price">السعر الإجمالي المخصص (ج.م)</label><input type="number" id="custom-price" step="0.01" inputmode="decimal" value="1500" min="0" data-oninput="a29"></div>
             </div>
 
             <div class="form-gold-group"><label for="price">السعر الإجمالي (ج.م)</label><input type="number" id="price" readonly></div>
-            <div class="form-gold-group"><label for="paid">المبلغ المدفوع (ج.م)</label><input type="number" id="paid" placeholder="المبلغ المدفوع" data-oninput="a30"></div>
+            <div class="form-gold-group"><label for="paid">المبلغ المدفوع (ج.م)</label><input type="number" id="paid" step="0.01" inputmode="decimal" placeholder="المبلغ المدفوع" data-oninput="a30"></div>
             <div class="form-gold-group"><label for="remaining">المبلغ المتبقي (ج.م)</label><input type="number" id="remaining" readonly></div>
 
             <button class="modal-submit-gold" data-onclick="a31">حفظ وإضافة المشترك</button>
@@ -294,11 +292,11 @@
 
         <div id="edit-custom-pkg-box">
             <div class="form-gold-group"><label for="edit-custom-sessions">عدد الحصص المخصصة</label><input type="number" id="edit-custom-sessions" min="1" data-oninput="a36"></div>
-            <div class="form-gold-group"><label for="edit-custom-price">السعر الإجمالي المخصص (ج.م)</label><input type="number" id="edit-custom-price" min="0" data-oninput="a37"></div>
+            <div class="form-gold-group"><label for="edit-custom-price">السعر الإجمالي المخصص (ج.م)</label><input type="number" id="edit-custom-price" step="0.01" inputmode="decimal" min="0" data-oninput="a37"></div>
         </div>
 
         <div class="form-gold-group"><label for="edit-price">السعر الإجمالي</label><input type="number" id="edit-price" readonly></div>
-        <div class="form-gold-group"><label for="edit-paid">المبلغ المدفوع</label><input type="number" id="edit-paid" data-oninput="a38"></div>
+        <div class="form-gold-group"><label for="edit-paid">المبلغ المدفوع</label><input type="number" id="edit-paid" step="0.01" inputmode="decimal" data-oninput="a38"></div>
         <div class="form-gold-group"><label for="edit-remaining">المتبقي</label><input type="number" id="edit-remaining" readonly></div>
 
         <button class="modal-submit-gold" data-onclick="a39">حفظ التعديلات</button>
@@ -313,7 +311,8 @@
             <button class="modal-gold-close" aria-label="إغلاق" data-onclick="a40">&times;</button>
         </div>
         <div class="form-gold-group"><label for="expense-title">بند المصروف</label><input type="text" id="expense-title" placeholder="كهرباء، صيانة، إيجار..."></div>
-        <div class="form-gold-group"><label for="expense-amount">المبلغ (ج.م)</label><input type="number" id="expense-amount" placeholder="المبلغ المنصرف"></div>
+        <div class="form-gold-group"><label for="expense-amount">المبلغ (ج.م)</label><input type="number" id="expense-amount" min="0.01" step="0.01" inputmode="decimal" placeholder="المبلغ المنصرف"></div>
+        <div class="form-gold-group"><label for="expense-date">تاريخ المصروف</label><input type="date" id="expense-date" required></div>
         <button class="modal-submit-gold" data-onclick="a41">تسجيل المصروف</button>
         <div class="expense-history">
             <h4>المصروفات المسجلة</h4>
@@ -325,12 +324,45 @@
 
 <div id="modal-backups" class="modal-gold-overlay"><section class="modal-gold-box">
  <div class="modal-gold-header"><h2>النسخ الاحتياطية</h2><button class="modal-gold-close" aria-label="إغلاق" data-onclick="a42">×</button></div>
- <p id="backup-policy"></p><div class="backup-actions"><button class="modal-submit-gold" data-onclick="a43">تنزيل البيانات الحالية على الجهاز</button><button id="create-backup-btn" class="gold-tool-btn" data-onclick="a44">حفظ نسخة داخلية اليوم</button></div>
+ <p id="backup-policy"></p><div class="backup-actions"><button class="modal-submit-gold" data-onclick="a43">تنزيل نسخة مشفّرة</button><button id="create-backup-btn" class="gold-tool-btn" data-onclick="a44">حفظ نسخة داخلية اليوم</button></div>
  <p id="backup-result" role="status"></p><div id="backup-list"></div>
- <p class="muted">احتفظ بنسخة من بياناتك على جهازك. تجنّب رفع بيانات الأعضاء إلى مستودع GitHub.</p>
+ <p class="muted">احتفظ بكلمة مرور النسخة التي كانت مستخدمة عند تنزيلها، فهي مطلوبة لاستعادتها.</p>
 </section></div>
 
+<dialog id="password-dialog" class="admin-dialog" aria-labelledby="password-title">
+    <header class="modal-gold-header"><h2 id="password-title">تغيير كلمة المرور</h2><button id="password-dismiss" class="modal-gold-close" type="button" aria-label="إغلاق">×</button></header>
+    <form id="password-change-form">
+        <div class="form-gold-group"><label for="current-password">كلمة المرور الحالية</label><input id="current-password" type="password" autocomplete="current-password" required maxlength="256"></div>
+        <div class="form-gold-group"><label for="new-password">كلمة المرور الجديدة</label><input id="new-password" type="password" autocomplete="new-password" required minlength="12" maxlength="256"></div>
+        <div class="form-gold-group"><label for="new-password-confirm">تأكيد كلمة المرور الجديدة</label><input id="new-password-confirm" type="password" autocomplete="new-password" required minlength="12" maxlength="256"></div>
+        <button type="submit" class="modal-submit-gold">حفظ كلمة المرور الجديدة</button>
+        <p id="password-feedback" class="muted" role="status"></p>
+    </form>
+</dialog>
+
+<dialog id="finance-report" class="admin-dialog finance-report" aria-labelledby="report-title">
+    <header class="modal-gold-header"><div><h2 id="report-title">الحسابات الشهرية</h2><p id="report-period"></p></div><button id="report-close" class="modal-gold-close" type="button" aria-label="إغلاق">×</button></header>
+    <div class="report-tools">
+        <label for="report-month">شهر التقرير</label><input type="month" id="report-month" required>
+        <button id="report-csv" class="gold-tool-btn" type="button">تنزيل CSV</button>
+        <button id="report-print" class="gold-tool-btn" type="button">طباعة / PDF</button>
+        <button id="report-email" class="gold-tool-btn" type="button">مسودة بريد</button>
+    </div>
+    <dl class="report-totals">
+        <div><dt>المقبوضات</dt><dd id="report-income"></dd></div>
+        <div><dt>المصروفات</dt><dd id="report-expenses"></dd></div>
+        <div><dt>الصافي</dt><dd id="report-net"></dd></div>
+    </dl>
+    <p id="report-undated" class="muted" role="status"></p>
+    <h3>سجل الحركات المالية</h3>
+    <p id="report-empty" class="muted">لا توجد حركات في الشهر المحدد.</p>
+    <div class="report-table"><table><thead><tr><th scope="col">التاريخ</th><th scope="col">النوع</th><th scope="col">البيان</th><th scope="col">القيمة</th></tr></thead><tbody id="report-ledger"></tbody></table></div>
+    <h3>سجل العمليات</h3>
+    <p id="activity-empty" class="muted">لا توجد عمليات مسجلة في الشهر المحدد.</p>
+    <div class="report-table"><table><thead><tr><th scope="col">الوقت</th><th scope="col">العملية</th><th scope="col">مرجع السجل</th></tr></thead><tbody id="report-activity"></tbody></table></div>
+</dialog>
+
 <script src="./assets/qrcode.min.js" defer></script>
-<script type="module" src="./events.js?v=2"></script>
+<script type="module" src="./events.js?v=3"></script>
 </body>
 </html>
