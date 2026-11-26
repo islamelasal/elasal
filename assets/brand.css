@@ -42,17 +42,8 @@ body[data-theme="green"] {
     border-block-end: 1px solid var(--border-color);
 }
 
-.brand-wordmark {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 700;
-    letter-spacing: .085em;
-    line-height: 1.1;
-}
-
-.brand-wordmark img { flex: 0 0 44px; border: 1px solid #54452e; border-radius: 10px; }
-.brand-wordmark small { display: block; margin-block-start: 4px; color: var(--text-muted); font-size: .63rem; letter-spacing: .14em; }
+.admin-brand img { width: clamp(145px, 45vw, 245px); height: auto; }
+.website-link { padding-inline: 9px; font-size: .84rem; text-decoration: none; }
 
 .entry-hero {
     display: grid;
