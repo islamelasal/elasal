@@ -1,10 +1,10 @@
-import './app.js';
+import './app.js?v=2';
 const actions = {
   a0: function(event) { event.preventDefault(); login() },
   a1: function(event) { connectServer() },
   a2: function(event) { startLocal() },
   a3: function(event) { showConnectionSettings() },
-  a4: function(event) { viewLargeImage(this.src) },
+  a4: function(event) { viewLargeImage(this.querySelector('img').src) },
   a5: function(event) { updateManagerPhoto(event) },
   a6: function(event) { openAddMemberModal() },
   a7: function(event) { changeTheme(this.value) },

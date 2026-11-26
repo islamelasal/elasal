@@ -5,139 +5,171 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'">
     <meta name="referrer" content="no-referrer">
+    <meta name="theme-color" content="#111011">
+    <meta name="description" content="لوحة أكاديمية العسال للملاكمة لمتابعة المشتركين والحصص والمقبوضات.">
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
-    <title>أكاديمية العسال للملاكمة | الجيل القادم 2026</title>
-    <!-- مكتبة توليد QR Code -->
-    <link rel="stylesheet" href="./assets/base.css">
-<link rel="stylesheet" href="./assets/brand.css">
+    <title>أكاديمية العسال للملاكمة</title>
+    <link rel="stylesheet" href="./assets/base.css?v=2">
+    <link rel="stylesheet" href="./assets/brand.css?v=2">
 </head>
 <body>
-
-<section id="entry-screen" class="entry-card">
- <div class="brand-wordmark"><strong>EA</strong><span>ELASAL <small>BOXING ACADEMY</small></span></div>
- <h1>أكاديمية العسال للملاكمة</h1><p id="entry-status" role="status">جارٍ فحص الاتصال</p>
- <form id="login-form" hidden data-onsubmit="a0">
-  <label for="admin-password">كلمة مرور المدير</label><input id="admin-password" type="password" autocomplete="current-password" required maxlength="256">
-  <button class="modal-submit-gold" type="submit">دخول</button>
- </form>
- <section id="setup-options" hidden>
-  <p id="setup-hint">النسخ اليومية على السيرفر تتطلب ربط Cloudflare. الوضع المحلي يحفظ على هذا المتصفح فقط، ويعمل النسخ التلقائي أثناء فتح الصفحة.</p>
-  <button class="modal-submit-gold" data-onclick="a2">فتح الوضع المحلي على هذا الجهاز</button>
-  <label for="api-url">رابط خادم Cloudflare</label><input id="api-url" type="url" placeholder="https://" dir="ltr">
-  <button id="connect-server-btn" class="gold-tool-btn" data-onclick="a1">الاتصال بالخادم</button>
- </section>
- <button id="change-server-btn" class="gold-tool-btn" data-onclick="a3" hidden>إعداد الاتصال</button>
-</section>
-
-
-<div id="app" class="container" hidden>
-    <section class="storage-bar" aria-live="polite"><span id="storage-status">جارٍ فحص التخزين</span><span id="operation-status"></span></section>
-    <header class="boxing-header">
-        <div class="brand-wordmark" aria-label="ELASAL Boxing Academy"><strong>EA</strong><span>ELASAL <small>BOXING ACADEMY</small></span></div>
-        <div class="admin-crown-box">
-            <div class="avatar-gold-frame">
-                <img id="manager-img" src="./assets/avatar.svg" class="manager-img" alt="الإدارة" data-onclick="a4" style="cursor:pointer;" title="عرض الصورة بحجم كبير">
-                <label for="manager-photo-input" class="camera-gold-btn" title="تغيير الصورة">
-                    <i class="fa-solid fa-camera"></i>
-                </label>
-                <input type="file" id="manager-photo-input" class="hidden-input" accept="image/*" data-onchange="a5">
+    <main id="entry-screen" class="site-shell">
+        <header class="site-header">
+            <div class="brand-wordmark" lang="en" dir="ltr">
+                <img src="./assets/favicon.svg" width="44" height="44" alt="">
+                <span>ELASAL<small>BOXING ACADEMY</small></span>
             </div>
-            <span class="admin-tag"><i class="fa-solid fa-microchip"></i> إدارة الأكاديمية · الإصدار 3.0</span>
-        </div>
-
-        <div class="academy-title-box">
-            <h1>
-                <span>أكاديمية العسال للملاكمة</span>
-                <span class="en-title">ELASAL BOXING ACADEMY</span>
-            </h1>
-        </div>
-
-        <button class="primary-gold-btn" data-onclick="a6">
-            <i class="fa-solid fa-user-plus"></i> تسجيل مشترك جديد
-        </button>
-
-        <div class="theme-control"><label for="brand-theme">الهوية</label><select id="brand-theme" data-onchange="a7"><option value="black">أسود مطفي</option><option value="blue">أزرق ملكي</option><option value="red">أحمر داكن</option><option value="green">أخضر زمردي</option></select></div>
-        <div class="header-tools-grid">
-            <button class="gold-tool-btn" data-onclick="a8"><i class="fa-brands fa-whatsapp" style="color:var(--whatsapp);"></i> إعدادات الواتس</button>
-            <button class="gold-tool-btn" data-onclick="a9"><i class="fa-solid fa-wallet" style="color:var(--warning);"></i> المصروفات</button>
-            <button class="gold-tool-btn" data-onclick="a10"><i class="fa-solid fa-download" style="color:var(--primary);"></i> نسخة احتياطية</button>
-            <label class="gold-tool-btn" style="cursor:pointer; margin-bottom:0;">
-                <i class="fa-solid fa-upload" style="color:var(--neon-pink);"></i> استعادة النسخة
-                <input type="file" id="import-file" accept=".json" style="display:none;" data-onchange="a11">
-            </label>
-        </div>
-<div class="session-tools"><button class="gold-tool-btn" data-onclick="a12">تحديث البيانات</button><button class="gold-tool-btn" data-settings="connection">التخزين والاتصال</button><button id="logout-btn" class="gold-tool-btn" data-onclick="a13" hidden>تسجيل الخروج</button></div>
-    </header>
-
-    <div class="gold-stats-grid">
-        <div class="stat-gold-card">
-            <div class="stat-lbl">إجمالي المشتركين</div>
-            <div class="stat-val" id="total-members">0</div>
-        </div>
-        <div class="stat-gold-card">
-            <div class="stat-lbl">المشتركين النشطين</div>
-            <div class="stat-val" id="active-members">0</div>
-        </div>
-        <div class="stat-gold-card inc">
-            <div class="stat-lbl">المقبوضات المسجلة</div>
-            <div class="stat-val" id="total-income">0 ج.م</div>
-        </div>
-        <div class="stat-gold-card deb">
-            <div class="stat-lbl">إجمالي الديون</div>
-            <div class="stat-val" id="total-debts">0 ج.م</div>
-        </div>
-        <div class="stat-gold-card net">
-            <div class="stat-lbl">المقبوضات − المصروفات</div>
-            <div class="stat-val" id="net-profit">0 ج.م</div>
-        </div>
-    </div>
-
-    <div class="search-gold-box">
-        <input type="text" id="search-input" class="search-gold-input" placeholder="بحث ذكي بالاسم أو رقم الهاتف..." data-oninput="a14">
-        <i class="fa-solid fa-magnifying-glass"></i>
-    </div>
-
-    <div class="quick-filters-row">
-        <div class="filter-chip active" role="button" tabindex="0" data-onclick="a15"> كل الأعضاء</div>
-        <div class="filter-chip" role="button" tabindex="0" data-onclick="a16"> النشطون فقط</div>
-        <div class="filter-chip" role="button" tabindex="0" data-onclick="a17"> أصحاب الديون</div>
-    </div>
-
-    <div class="accordions-gold-wrap">
-        <div class="accordion-gold-group open" id="acc-active">
-            <div class="accordion-gold-trigger" role="button" tabindex="0" data-onclick="a18">
-                <div class="accordion-title-flex">
-                    <i class="fa-solid fa-circle-check" style="color:var(--success);"></i> المشتركين النشطين
-                    <span class="counter-badge-gold" id="count-active">0</span>
+        </header>
+        <div class="entry-hero">
+            <div class="entry-content">
+                <p id="entry-status" role="status">جارٍ فحص الاتصال</p>
+                <h1>أكاديمية العسال <span>للملاكمة</span></h1>
+                <p class="entry-description">لوحة إدارة المشتركين والحصص والمقبوضات.</p>
+                <form id="login-form" hidden data-onsubmit="a0">
+                    <label for="admin-password">كلمة مرور المدير</label>
+                    <input id="admin-password" type="password" autocomplete="current-password" required maxlength="256">
+                    <button class="modal-submit-gold" type="submit">دخول</button>
+                </form>
+                <div id="setup-options" hidden>
+                    <button class="primary-gold-btn entry-action" type="button" data-onclick="a2">
+                        فتح الوضع المحلي على هذا الجهاز <span aria-hidden="true">←</span>
+                    </button>
+                    <p id="setup-hint">تُحفظ بيانات الوضع المحلي في هذا المتصفح.</p>
+                    <details id="server-options" class="server-options">
+                        <summary>الاتصال بخادم Cloudflare</summary>
+                        <label for="api-url">رابط خادم Cloudflare</label>
+                        <input id="api-url" type="url" placeholder="https://" dir="ltr" aria-describedby="connection-status">
+                        <button id="connect-server-btn" class="gold-tool-btn" type="button" data-onclick="a1">الاتصال بالخادم</button>
+                        <p id="connection-status" role="status"></p>
+                    </details>
                 </div>
-                <i class="fa-solid fa-chevron-down" style="font-size:0.8rem; color:var(--text-muted);"></i>
+                <button id="change-server-btn" class="gold-tool-btn" type="button" data-onclick="a3" hidden>إعداد الاتصال</button>
             </div>
-            <div class="accordion-gold-body" id="list-active"></div>
+            <figure class="entry-portrait">
+                <img src="./assets/coach.webp" width="1200" height="900" alt="" fetchpriority="high">
+                <figcaption><small>مدرّب الأكاديمية</small>الكابتن محمد العسال</figcaption>
+            </figure>
+        </div>
+    </main>
+
+    <main id="app" class="site-shell dashboard" hidden>
+        <header class="site-header">
+            <div class="brand-wordmark" lang="en" dir="ltr">
+                <img src="./assets/favicon.svg" width="44" height="44" alt="">
+                <span>ELASAL<small>BOXING ACADEMY</small></span>
+            </div>
+            <div class="dashboard-preferences">
+                <div class="theme-control">
+                    <label for="brand-theme">الهوية</label>
+                    <select id="brand-theme" data-onchange="a7">
+                        <option value="black">أسود مطفي</option>
+                        <option value="blue">أزرق ملكي</option>
+                        <option value="red">أحمر داكن</option>
+                        <option value="green">أخضر زمردي</option>
+                    </select>
+                </div>
+                <div class="profile-tools">
+                    <button class="avatar-preview" type="button" data-onclick="a4" aria-label="عرض صورة الإدارة">
+                        <img id="manager-img" src="./assets/avatar.svg" class="manager-img" width="36" height="36" alt="">
+                    </button>
+                    <label class="photo-upload" for="manager-photo-input">
+                        تغيير الصورة
+                        <input type="file" id="manager-photo-input" class="visually-hidden" accept="image/*" data-onchange="a5">
+                    </label>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-overview">
+            <div>
+                <h1>لوحة إدارة الأكاديمية</h1>
+                <div class="storage-bar" aria-live="polite">
+                    <span id="storage-status">جارٍ فحص التخزين</span>
+                    <span id="operation-status"></span>
+                </div>
+            </div>
+            <button class="primary-gold-btn" type="button" data-onclick="a6">
+                <span class="button-plus" aria-hidden="true">+</span> تسجيل مشترك جديد
+            </button>
         </div>
 
-        <div class="accordion-gold-group" id="acc-expired">
-            <div class="accordion-gold-trigger" role="button" tabindex="0" data-onclick="a19">
-                <div class="accordion-title-flex">
-                    <i class="fa-solid fa-triangle-exclamation" style="color:var(--danger);"></i> الاشتراكات المنتهية
-                    <span class="counter-badge-gold" id="count-expired">0</span>
+        <section class="dashboard-summary" aria-labelledby="summary-title">
+            <h2 id="summary-title">ملخص الأكاديمية</h2>
+            <dl class="gold-stats-grid">
+                <div class="stat-gold-card">
+                    <dt class="stat-lbl">إجمالي المشتركين</dt>
+                    <dd class="stat-val" id="total-members">0</dd>
                 </div>
-                <i class="fa-solid fa-chevron-down" style="font-size:0.8rem; color:var(--text-muted);"></i>
-            </div>
-            <div class="accordion-gold-body" id="list-expired"></div>
-        </div>
+                <div class="stat-gold-card inc">
+                    <dt class="stat-lbl">المشتركون النشطون</dt>
+                    <dd class="stat-val" id="active-members">0</dd>
+                </div>
+                <div class="stat-gold-card">
+                    <dt class="stat-lbl">المقبوضات المسجلة</dt>
+                    <dd class="stat-val" id="total-income">0 ج.م</dd>
+                </div>
+                <div class="stat-gold-card deb">
+                    <dt class="stat-lbl">الديون المستحقة</dt>
+                    <dd class="stat-val" id="total-debts">0 ج.م</dd>
+                </div>
+                <div class="stat-gold-card net">
+                    <dt class="stat-lbl">المقبوضات بعد المصروفات</dt>
+                    <dd class="stat-val" id="net-profit">0 ج.م</dd>
+                </div>
+            </dl>
+        </section>
 
-        <div class="accordion-gold-group" id="acc-debts">
-            <div class="accordion-gold-trigger" role="button" tabindex="0" data-onclick="a20">
-                <div class="accordion-title-flex">
-                    <i class="fa-solid fa-file-invoice-dollar" style="color:var(--warning);"></i> أصحاب الديون المتبقية
-                    <span class="counter-badge-gold" id="count-debts">0</span>
+        <div class="dashboard-grid">
+            <section class="dashboard-panel members-panel" aria-labelledby="members-title">
+                <h2 id="members-title">المشتركون</h2>
+                <div class="search-gold-box">
+                    <label class="visually-hidden" for="search-input">البحث عن مشترك</label>
+                    <input type="search" id="search-input" class="search-gold-input" placeholder="ابحث بالاسم أو رقم الهاتف" data-oninput="a14">
                 </div>
-                <i class="fa-solid fa-chevron-down" style="font-size:0.8rem; color:var(--text-muted);"></i>
-            </div>
-            <div class="accordion-gold-body" id="list-debts"></div>
+                <div class="quick-filters-row" aria-label="تصفية المشتركين" role="group">
+                    <button class="filter-chip active" type="button" aria-pressed="true" data-onclick="a15">كل الأعضاء</button>
+                    <button class="filter-chip" type="button" aria-pressed="false" data-onclick="a16">النشطون فقط</button>
+                    <button class="filter-chip" type="button" aria-pressed="false" data-onclick="a17">أصحاب الديون</button>
+                </div>
+                <div class="accordions-gold-wrap">
+                    <div class="accordion-gold-group open" id="acc-active">
+                        <button class="accordion-gold-trigger" type="button" aria-controls="list-active" aria-expanded="true" data-onclick="a18">
+                            <span class="accordion-title-flex">المشتركون النشطون <span class="counter-badge-gold" id="count-active">0</span></span>
+                        </button>
+                        <div class="accordion-gold-body" id="list-active"></div>
+                    </div>
+                    <div class="accordion-gold-group" id="acc-expired">
+                        <button class="accordion-gold-trigger" type="button" aria-controls="list-expired" aria-expanded="false" data-onclick="a19">
+                            <span class="accordion-title-flex">الاشتراكات المنتهية <span class="counter-badge-gold" id="count-expired">0</span></span>
+                        </button>
+                        <div class="accordion-gold-body" id="list-expired"></div>
+                    </div>
+                    <div class="accordion-gold-group" id="acc-debts">
+                        <button class="accordion-gold-trigger" type="button" aria-controls="list-debts" aria-expanded="false" data-onclick="a20">
+                            <span class="accordion-title-flex">أصحاب الديون <span class="counter-badge-gold" id="count-debts">0</span></span>
+                        </button>
+                        <div class="accordion-gold-body" id="list-debts"></div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="dashboard-panel" aria-labelledby="tools-title">
+                <h2 id="tools-title">أدوات الإدارة</h2>
+                <div class="tool-list">
+                    <button class="gold-tool-btn" type="button" data-onclick="a9">المصروفات</button>
+                    <button class="gold-tool-btn" type="button" data-onclick="a10">النسخ الاحتياطية</button>
+                    <label class="gold-tool-btn" for="import-file">
+                        استعادة نسخة من ملف
+                        <input type="file" id="import-file" accept=".json" class="visually-hidden" data-onchange="a11">
+                    </label>
+                    <button class="gold-tool-btn" type="button" data-onclick="a8">إعدادات واتساب</button>
+                    <button class="gold-tool-btn" type="button" data-onclick="a12">تحديث البيانات</button>
+                    <button class="gold-tool-btn" type="button" data-settings="connection">التخزين والاتصال</button>
+                    <button id="logout-btn" class="gold-tool-btn" type="button" data-onclick="a13" hidden>تسجيل الخروج</button>
+                </div>
+            </aside>
         </div>
-    </div>
-</div>
+    </main>
 
 <!-- نافذة عرض الصورة بحجم كبير -->
 <div id="modal-img-viewer" data-onclick="a21">
@@ -149,19 +181,19 @@
 <div id="modal-qr" class="modal-gold-overlay">
     <div class="modal-gold-box" style="text-align: center;">
         <div class="modal-gold-header">
-            <h3><i class="fa-solid fa-qrcode" style="color:var(--neon-pink);"></i> كود دخول العميل</h3>
-            <button class="modal-gold-close" data-onclick="a23">&times;</button>
+            <h3>كود دخول العميل</h3>
+            <button class="modal-gold-close" aria-label="إغلاق" data-onclick="a23">&times;</button>
         </div>
         <div style="margin: 15px 0; font-weight: bold; color: var(--text-main);" id="qr-member-name"></div>
         <div id="qrcode-container" style="background: white; padding: 15px; display: inline-block; border-radius: 12px; margin-bottom: 15px;" title="اضغط مطولاً على الصورة لحفظها"></div>
         <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 15px;">اضغط على زر (عرض الصورة بالحجم الكامل) لحفظها بسهولة، أو أرسل رسالة الواتساب مباشرة.</p>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <button class="modal-submit-gold" data-onclick="a24" style="background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%); margin-top:0;">
-                <i class="fa-solid fa-eye"></i> عرض وحفظ الصورة
+        <div class="qr-actions">
+            <button class="modal-submit-gold" data-onclick="a24" type="button">
+                عرض وحفظ الصورة
             </button>
-            <button class="modal-submit-gold" data-onclick="a25" style="background: linear-gradient(180deg, #22c55e 0%, #15803d 100%); margin-top:0;">
-                <i class="fa-brands fa-whatsapp"></i> إرسال واتساب
+            <button class="gold-tool-btn" data-onclick="a25" type="button">
+                إرسال واتساب
             </button>
         </div>
     </div>
@@ -171,8 +203,8 @@
 <div id="modal-add" class="modal-gold-overlay">
     <div class="modal-gold-box">
         <div class="modal-gold-header">
-            <h3><i class="fa-solid fa-user-plus" style="color:var(--primary);"></i> تسجيل مشترك جديد</h3>
-            <button class="modal-gold-close" data-onclick="a26">&times;</button>
+            <h3>تسجيل مشترك جديد</h3>
+            <button class="modal-gold-close" aria-label="إغلاق" data-onclick="a26">&times;</button>
         </div>
         <div>
             <div class="form-gold-group"><label for="name">اسم المشترك</label><input type="text" id="name" placeholder="مثال: يوسف العسال"></div>
@@ -209,7 +241,7 @@
             <div class="form-gold-group"><label for="paid">المبلغ المدفوع (ج.م)</label><input type="number" id="paid" placeholder="المبلغ المدفوع" data-oninput="a30"></div>
             <div class="form-gold-group"><label for="remaining">المبلغ المتبقي (ج.م)</label><input type="number" id="remaining" readonly></div>
             
-            <button class="modal-submit-gold" data-onclick="a31"><i class="fa-solid fa-check"></i> حفظ وإضافة المشترك</button>
+            <button class="modal-submit-gold" data-onclick="a31">حفظ وإضافة المشترك</button>
         </div>
     </div>
 </div>
@@ -218,14 +250,14 @@
 <div id="modal-settings" class="modal-gold-overlay">
     <div class="modal-gold-box">
         <div class="modal-gold-header">
-            <h3><i class="fa-brands fa-whatsapp" style="color:var(--whatsapp);"></i> إعدادات رقم الواتساب</h3>
-            <button class="modal-gold-close" data-onclick="a32">&times;</button>
+            <h3>إعدادات رقم الواتساب</h3>
+            <button class="modal-gold-close" aria-label="إغلاق" data-onclick="a32">&times;</button>
         </div>
         <div class="form-gold-group">
             <label for="admin-whatsapp">رقم الواتساب الأساسي للإدارة</label><input type="tel" id="admin-whatsapp" placeholder="مثال: 01012345678">
             <small style="color:var(--text-muted); display:block; margin-top:4px; font-size:0.75rem;">رقم تواصل الإدارة. الرسائل تفتح للمشترك في واتساب وتُرسل يدويًا.</small>
         </div>
-        <button class="modal-submit-gold" data-onclick="a33"><i class="fa-solid fa-floppy-disk"></i> حفظ الرقم</button>
+        <button class="modal-submit-gold" data-onclick="a33">حفظ الرقم</button>
     </div>
 </div>
 
@@ -233,8 +265,8 @@
 <div id="modal-edit" class="modal-gold-overlay">
     <div class="modal-gold-box">
         <div class="modal-gold-header">
-            <h3><i class="fa-solid fa-user-pen" style="color:var(--primary);"></i> تعديل بيانات المشترك</h3>
-            <button class="modal-gold-close" data-onclick="a34">&times;</button>
+            <h3>تعديل بيانات المشترك</h3>
+            <button class="modal-gold-close" aria-label="إغلاق" data-onclick="a34">&times;</button>
         </div>
         <input type="hidden" id="edit-id">
         <div class="form-gold-group"><label for="edit-name">اسم المشترك</label><input type="text" id="edit-name"></div>
@@ -270,7 +302,7 @@
         <div class="form-gold-group"><label for="edit-paid">المبلغ المدفوع</label><input type="number" id="edit-paid" data-oninput="a38"></div>
         <div class="form-gold-group"><label for="edit-remaining">المتبقي</label><input type="number" id="edit-remaining" readonly></div>
         
-        <button class="modal-submit-gold" data-onclick="a39"><i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات</button>
+        <button class="modal-submit-gold" data-onclick="a39">حفظ التعديلات</button>
     </div>
 </div>
 
@@ -278,28 +310,28 @@
 <div id="modal-expense" class="modal-gold-overlay">
     <div class="modal-gold-box">
         <div class="modal-gold-header">
-            <h3><i class="fa-solid fa-wallet" style="color:var(--warning);"></i> تسجيل المصروفات</h3>
-            <button class="modal-gold-close" data-onclick="a40">&times;</button>
+            <h3>تسجيل المصروفات</h3>
+            <button class="modal-gold-close" aria-label="إغلاق" data-onclick="a40">&times;</button>
         </div>
         <div class="form-gold-group"><label for="expense-title">بند المصروف</label><input type="text" id="expense-title" placeholder="كهرباء، صيانة، إيجار..."></div>
         <div class="form-gold-group"><label for="expense-amount">المبلغ (ج.م)</label><input type="number" id="expense-amount" placeholder="المبلغ المنصرف"></div>
-        <button class="modal-submit-gold" data-onclick="a41"><i class="fa-solid fa-check"></i> تسجيل المصروف</button>
-        <div style="margin-top:14px;">
-            <h4 style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px; text-align:center;">سجل المصروفات السابقة:</h4>
-            <div id="expenses-list" style="max-height:120px; overflow-y:auto;"></div>
+        <button class="modal-submit-gold" data-onclick="a41">تسجيل المصروف</button>
+        <div class="expense-history">
+            <h4>المصروفات المسجلة</h4>
+            <div id="expenses-list"></div>
         </div>
     </div>
 </div>
 
 
 <div id="modal-backups" class="modal-gold-overlay"><section class="modal-gold-box">
- <div class="modal-gold-header"><h2>النسخ الاحتياطية</h2><button class="modal-gold-close" data-onclick="a42" aria-label="إغلاق">×</button></div>
+ <div class="modal-gold-header"><h2>النسخ الاحتياطية</h2><button class="modal-gold-close" aria-label="إغلاق" data-onclick="a42">×</button></div>
  <p id="backup-policy"></p><div class="backup-actions"><button class="modal-submit-gold" data-onclick="a43">تنزيل البيانات الحالية على الجهاز</button><button id="create-backup-btn" class="gold-tool-btn" data-onclick="a44">حفظ نسخة داخلية اليوم</button></div>
  <p id="backup-result" role="status"></p><div id="backup-list"></div>
- <p class="muted">النسخ الداخلية محفوظة داخل حساب الاستضافة نفسه. نسخة المدير على جهازه تحمي من فقد الحساب. لا ترفع ملفات بيانات الأعضاء إلى مستودع GitHub.</p>
+ <p class="muted">احتفظ بنسخة من بياناتك على جهازك. تجنّب رفع بيانات الأعضاء إلى مستودع GitHub.</p>
 </section></div>
 
 <script src="./assets/qrcode.min.js" defer></script>
-<script type="module" src="./events.js"></script>
+<script type="module" src="./events.js?v=2"></script>
 </body>
 </html>

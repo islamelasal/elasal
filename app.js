@@ -40,6 +40,7 @@ function enter() {
   $('entry-screen').hidden = true; $('app').hidden = false; $('logout-btn').hidden = mode !== 'cloud';
   $('storage-status').textContent = mode === 'cloud' ? 'حفظ مركزي · ' + (base || location.origin) : 'محلي على هذا المتصفح · النسخ التلقائي أثناء فتح الصفحة فقط';
   $('manager-img').src = photo(state.managerPhoto); setDefaultDate(); checkPackageSelection(); render();
+  window.scrollTo(0, 0);
 }
 async function initApp() {
   changeTheme(localStorage.getItem('elasal_theme') || 'black');
@@ -74,12 +75,17 @@ function showConnectionSettings() {
   $('app').hidden = true; $('entry-screen').hidden = false; $('login-form').hidden = true; $('setup-options').hidden = false; $('change-server-btn').hidden = true;
   $('entry-status').textContent = pagesDemo ? 'نسخة GitHub Pages للعرض والتجربة' : 'اختر طريقة تخزين البيانات';
   $('api-url').value = base;
+  $('server-options').open = !pagesDemo || Boolean(base);
+  $('connection-status').textContent = '';
   if (pagesDemo) {
     $('connect-server-btn').textContent = 'فتح النظام على Cloudflare';
-    $('setup-hint').textContent = 'جرّب الموقع محليًا ببيانات تجريبية. دخول المدير والحفظ المركزي والنسخ اليومية تتطلب خادم Cloudflare منشورًا.';
+    $('setup-hint').textContent = 'استخدم بيانات تجريبية. تُحفظ البيانات في هذا المتصفح.';
   }
+  window.scrollTo(0, 0);
 }
 async function connectServer() {
+  const feedback = $('connection-status');
+  feedback.textContent = '';
   try {
     const serverUrl = $('api-url').value.trim();
     if (!serverUrl) throw Error('أدخل رابط خادم Cloudflare، أو افتح الوضع المحلي لتجربة الموقع.');
@@ -89,7 +95,7 @@ async function connectServer() {
     const h = await api('/api/health'); if (h.service !== 'elasal-academy') throw Error('الرابط لا يشغّل خادم الأكاديمية');
     if(pagesDemo){localStorage.setItem('elasal_api_base',base);location.assign(base);return;}
     localStorage.setItem('elasal_api_base', base); localStorage.setItem('elasal_mode', 'cloud'); mode = 'cloud'; lock('دخول المدير');
-  } catch (e) { $('entry-status').textContent = e.message; }
+  } catch (e) { feedback.textContent = e.message; }
 }
 async function startLocal() {
   try {
@@ -195,12 +201,32 @@ function render() {
     const card = `<article class="member-gold-card"><div class="member-gold-top"><img src="${esc(photo(m.photo))}" class="member-gold-avatar" alt="صورة ${esc(m.name)}" data-action="photo" data-id="${m.id}"><div class="member-gold-info"><h4>${esc(m.name)}</h4><p>${esc(m.phone)}</p><div class="tags-gold-row"><span class="gold-status-badge ${category === 'active' ? 'badge-active':'badge-expired'}">${category === 'active' ? 'نشط':'منتهي'}</span><span class="gold-status-badge badge-neutral">المتبقي ${m.remainingSessions} / ${m.totalSessions}</span>${debt ? `<span class="gold-status-badge badge-debt">مستحق ${money(m.remaining)}</span>`:''}</div></div></div><div class="progress-gold-container"><div class="progress-gold-meta"><span>حضر ${attended} حصة</span><span>البداية ${m.startDate} | الانتهاء ${expiryDate(m)}</span></div><div class="progress-gold-line"><div class="progress-gold-fill" style="width:${attended/m.totalSessions*100}%"></div></div></div><div class="card-gold-actions">${button('attend','حضور')}${button('whatsapp','واتساب')}${button('alert','تنبيه تجديد')}${debt ? button('settle','سداد مبلغ')+button('debt','مطالبة'):''}${button('renew','تجديد')}${button('qr','QR')}${button('edit','تعديل')}${button('correct','تصحيح الحصص')}${button('delete','حذف')}</div></article>`;
     containers[category].insertAdjacentHTML('beforeend',card); if(debt) containers.debts.insertAdjacentHTML('beforeend',card);
   }
-  for(const [kind,c] of Object.entries(containers)) { if(!c.children.length) c.textContent = 'لا توجد سجلات مطابقة'; $('count-'+kind).textContent = counts[kind]; }
+  for (const [kind, container] of Object.entries(containers)) {
+    if (!container.children.length) {
+      const empty = document.createElement('p');
+      empty.className = 'empty-gold-notice';
+      empty.textContent = query ? 'لا يوجد مشتركون يطابقون البحث.' : 'لا توجد سجلات في هذه القائمة.';
+      container.append(empty);
+    }
+    $('count-' + kind).textContent = counts[kind];
+  }
   $('total-members').textContent = state.members.length; $('active-members').textContent = counts.active;
   const income = state.payments.reduce((n,p)=>n+p.amount,0), spent = state.expenses.reduce((n,e)=>n+e.amount,0);
   $('total-income').textContent = money(income); $('total-debts').textContent = money(state.members.reduce((n,m)=>n+m.remaining,0)); $('net-profit').textContent = money(income-spent);
 }
-function setFilter(type,el) { currentFilter = type; document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); render(); }
+function setFilter(type, selected) {
+  currentFilter = type;
+  for (const chip of document.querySelectorAll('.filter-chip')) {
+    chip.classList.toggle('active', chip === selected);
+    chip.setAttribute('aria-pressed', String(chip === selected));
+  }
+  render();
+}
+function toggleAccordion(id) {
+  const accordion = $(id);
+  const expanded = accordion.classList.toggle('open');
+  accordion.querySelector('.accordion-gold-trigger').setAttribute('aria-expanded', String(expanded));
+}
 function renderExpenses() {
   const list = $('expenses-list'); list.replaceChildren();
   if (!state.expenses.length) { list.textContent = 'لا توجد مصروفات مسجلة'; return; }
@@ -314,12 +340,17 @@ document.addEventListener('click',async event=>{
     try { const b=backups[Number(backupButton.dataset.index)],value=mode==='cloud'?await api('/api/backups/'+encodeURIComponent(b.id)):await envelope(b.state); if(backupButton.dataset.backupAction==='download')download(value,'elasal-'+b.id.replace(/:/g,'-')+'.json');else await restoreData(value); }catch(e){error(e);}
   }
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.modal-gold-overlay').forEach(el=>el.style.display='none');close('modal-img-viewer');}if(['Enter',' '].includes(e.key)&&e.target.matches('.accordion-gold-trigger,.filter-chip')){e.preventDefault();e.target.click();}});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-gold-overlay').forEach(el => el.style.display = 'none');
+    close('modal-img-viewer');
+  }
+});
 window.addEventListener('storage',e=>{if(mode==='local'&&e.key==='elasal_state_v2')status('تم تعديل البيانات من تبويب آخر؛ اضغط تحديث البيانات',true);});
 window.addEventListener('offline',()=>status(mode==='cloud'?'انقطع الاتصال؛ التعديلات تحتاج اتصالًا بالخادم':'الوضع المحلي يعمل دون إنترنت',true));
 setInterval(()=>{if(mode==='local'&&!busy)tryLocalSnapshot();},3600000);
 Object.assign(window,{initApp,render,login,logout,startLocal,connectServer,showConnectionSettings,refreshData,changeTheme,
-  setFilter,toggleAccordion:id=>$(id).classList.toggle('open'),openAddMemberModal:()=>{setDefaultDate();checkPackageSelection();show('modal-add');},closeAddMemberModal:()=>close('modal-add'),
+  setFilter,toggleAccordion,openAddMemberModal:()=>{setDefaultDate();checkPackageSelection();show('modal-add');},closeAddMemberModal:()=>close('modal-add'),
   openSettingsModal:()=>{$('admin-whatsapp').value=state.adminWhatsApp;show('modal-settings');},closeSettingsModal:()=>close('modal-settings'),saveSettings,
   checkPackageSelection:()=>checkPackageSelection(),calcCustomPrice:()=>checkPackageSelection(),calcRemaining:()=>calcRemaining(),checkEditPackageSelection:()=>checkPackageSelection('edit-'),calcEditCustomPrice:()=>checkPackageSelection('edit-'),calcEditRemaining:()=>calcRemaining('edit-'),
   handleAddMember,updateManagerPhoto,openEditModal,saveEditedMember,closeEditModal:()=>close('modal-edit'),openExpenseModal:()=>{renderExpenses();show('modal-expense');},closeExpenseModal:()=>close('modal-expense'),addExpense,
