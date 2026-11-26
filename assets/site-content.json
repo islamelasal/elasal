@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "copy": {
+    "navHome": "الرئيسية",
+    "navTraining": "التدريب",
+    "navGallery": "معرض الصور",
+    "navContact": "الفروع والتواصل",
+    "navAdmin": "لوحة الإدارة",
+    "academy": "أكاديمية العسال للملاكمة",
+    "city": "مدينة نصر، القاهرة",
+    "quickWhatsApp": "واتساب",
+    "quickPhone": "اتصال",
+    "indexTitle": "أكاديمية العسال للملاكمة | مدينة نصر",
+    "indexDescription": "تدريب ملاكمة فردي وجماعي مع الكابتن محمد العسال في مدينة نصر. تعرّف على التدريب والفروع وطرق الحجز.",
+    "indexHeading": "أكاديمية العسال",
+    "indexAccent": "للملاكمة",
+    "indexLead": "تدريب ملاكمة فردي وجماعي مع الكابتن محمد العسال.",
+    "indexInquiry": "أكاديمية العسال والحجز",
+    "homeKicker": "مدينة نصر، القاهرة",
+    "homeTrainingLink": "استكشف التدريب",
+    "homeBooking": "احجز عبر واتساب",
+    "homeTrainingHeading": "اختار التدريب المناسب ليك",
+    "individual": "التدريب الفردي",
+    "individualShort": "جلسات تركّز على مستواك وأهدافك.",
+    "groups": "التدريب الجماعي",
+    "groupsShort": "تدرّب مع المجموعة وطوّر لياقتك ومهاراتك.",
+    "homeBranchesHeading": "فروع الأكاديمية",
+    "homeBranchesLine": "الحي السابع والحي الثامن في مدينة نصر.",
+    "homeBranchesLink": "العناوين وطرق التواصل",
+    "trainingTitle": "التدريب | أكاديمية العسال للملاكمة",
+    "trainingDescription": "تعرّف على التدريب الفردي والتدريب الجماعي للملاكمة مع الكابتن محمد العسال في مدينة نصر.",
+    "trainingHeading": "برامج",
+    "trainingAccent": "التدريب",
+    "trainingLead": "تعلّم أساسيات الملاكمة وطوّر مهاراتك ولياقتك مع الكابتن محمد العسال.",
+    "trainingInquiry": "برامج التدريب والمواعيد",
+    "trainingBooking": "اسأل عن المواعيد والحجز",
+    "programsHeading": "طرق التدريب",
+    "individualDetail": "جلسات مع المدرب تُركّز على مستواك. مناسبة لو محتاج وقتًا أطول للتدرّب على الأساسيات أو تحسين مهارة محددة.",
+    "individualInquire": "استفسر عن التدريب الفردي",
+    "groupsDetail": "حصص مع المجموعة تجمع بين اللياقة وتمارين الملاكمة. اسأل عن المجموعة المناسبة لمستواك ومواعيد التدريب.",
+    "groupsInquire": "استفسر عن التدريب الجماعي",
+    "galleryTitle": "معرض الصور | أكاديمية العسال للملاكمة",
+    "galleryDescription": "صور الكابتن محمد العسال من المواد التعريفية لأكاديمية العسال للملاكمة.",
+    "galleryHeading": "معرض",
+    "galleryAccent": "الصور",
+    "galleryLead": "صور الكابتن محمد العسال من المواد التعريفية للأكاديمية.",
+    "galleryInquiry": "الصور والتدريب في الأكاديمية",
+    "photoBack": "← الرجوع للمعرض",
+    "photoPrev": "الصورة السابقة",
+    "photoNext": "الصورة التالية",
+    "contactTitle": "الفروع والتواصل | أكاديمية العسال للملاكمة",
+    "contactDescription": "فروع أكاديمية العسال للملاكمة في الحي السابع والحي الثامن بمدينة نصر، ورقم الحجز والاستفسار.",
+    "contactHeading": "الفروع",
+    "contactAccent": "والتواصل",
+    "contactLead": "اتصل أو ابعت رسالة واتساب للاستفسار عن المواعيد والحجز.",
+    "contactInquiry": "الفروع والحجز",
+    "contactCall": "اتصل على",
+    "contactWhatsApp": "راسلنا على واتساب",
+    "branchesHeading": "فروع مدينة نصر",
+    "branchMap": "ابحث عن الفرع على الخريطة",
+    "branchWhatsApp": "استفسر عن الفرع",
+    "branchPhone": "اتصل بالفرع",
+    "navMember": "اشتراكي"
+  },
+  "contact": {
+    "phone": "+201004969332",
+    "whatsapp": "+201004969332"
+  },
+  "media": {
+    "logo": {
+      "src": "./assets/elasal-logo.webp",
+      "alt": "شعار أكاديمية العسال"
+    },
+    "home": {
+      "src": "./assets/coach.webp",
+      "alt": "الكابتن محمد العسال"
+    },
+    "training": {
+      "src": "./assets/coach-training.webp",
+      "alt": "الكابتن محمد العسال"
+    }
+  },
+  "branches": [
+    {
+      "id": "district-7",
+      "name": "الحي السابع",
+      "venue": "Top Fighters Academy",
+      "address": "شارع ذاكر حسين، مدينة نصر",
+      "map": "Top Fighters Academy Zaker Hussein Nasr City",
+      "phone": "",
+      "whatsapp": ""
+    },
+    {
+      "id": "district-8",
+      "name": "الحي الثامن",
+      "venue": "Ion Gym",
+      "address": "بجوار السراج مول، مدينة نصر",
+      "map": "Ion Gym El Serag Mall Nasr City",
+      "phone": "",
+      "whatsapp": ""
+    }
+  ],
+  "gallery": [
+    {
+      "id": "coach",
+      "src": "./assets/coach.webp",
+      "alt": "الكابتن محمد العسال",
+      "caption": "الكابتن محمد العسال"
+    },
+    {
+      "id": "coach-training",
+      "src": "./assets/coach-training.webp",
+      "alt": "الكابتن محمد العسال",
+      "caption": "الكابتن محمد العسال"
+    }
+  ]
+}

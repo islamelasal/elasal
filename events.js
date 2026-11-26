@@ -1,4 +1,4 @@
-import './app.js?v=3';
+import './app.js?v=5';
 const actions = {
   a0: function(event) { event.preventDefault(); login() },
   a4: function(event) { viewLargeImage(this.querySelector('img').src) },
@@ -42,5 +42,8 @@ const actions = {
   a42: function(event) { closeBackups() },
   a43: function(event) { exportData() },
   a44: function(event) { createBackup() },
+  a45: function(event) { setPackageEnd() },
+  a46: function(event) { setPackageEnd('edit-') },
+  a47: function(event) { toggleAccordion('acc-pending') },
 };
 for (const eventName of ['click','change','input','submit']) document.addEventListener(eventName, event => { const el = event.target.closest('[data-on' + eventName + ']'); if (el) actions[el.dataset['on' + eventName]].call(el, event); });

@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://prnwlfzwoqpozwddpmxo.supabase.co; font-src 'self'; connect-src 'self' https://prnwlfzwoqpozwddpmxo.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'">
     <meta name="referrer" content="no-referrer">
     <meta name="theme-color" content="#111011">
     <meta name="description" content="لوحة أكاديمية العسال للملاكمة لمتابعة المشتركين والحصص والمقبوضات.">
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
     <title>لوحة الإدارة | أكاديمية العسال للملاكمة</title>
     <link rel="stylesheet" href="./assets/base.css?v=2">
-    <link rel="stylesheet" href="./assets/brand.css?v=4">
+    <link rel="stylesheet" href="./assets/brand.css?v=6">
 </head>
 <body>
     <main id="entry-screen" class="site-shell">
@@ -26,15 +26,12 @@
                 <h1>أكاديمية العسال <span>للملاكمة</span></h1>
                 <p class="entry-description">لوحة إدارة المشتركين والحصص والمقبوضات.</p>
                 <form id="login-form" hidden data-onsubmit="a0">
-                    <p class="muted" id="initial-password-hint" hidden>اختر كلمة مرور من 12 حرفًا على الأقل لتشفير بيانات الإدارة والنسخ على هذا الجهاز.</p>
+                    <div class="form-gold-group"><label for="admin-email">البريد الإلكتروني</label><input id="admin-email" type="email" dir="ltr" autocomplete="username" required maxlength="254"></div>
                     <label for="admin-password">كلمة المرور</label>
                     <input id="admin-password" type="password" autocomplete="current-password" required maxlength="256">
-                    <div id="confirm-password-group" class="form-gold-group" hidden>
-                        <label for="confirm-password">تأكيد كلمة المرور</label>
-                        <input id="confirm-password" type="password" autocomplete="new-password" maxlength="256">
-                    </div>
-                    <button id="unlock-submit" class="modal-submit-gold" type="submit">فتح لوحة الإدارة</button>
+                    <button id="unlock-submit" class="modal-submit-gold" type="submit">دخول الإدارة</button>
                 </form>
+                <p class="muted"><a href="./member.html">دخول المشتركين</a></p>
             </div>
             <figure class="entry-portrait">
                 <img src="./assets/coach.webp" width="1200" height="900" alt="" fetchpriority="high">
@@ -128,6 +125,12 @@
                         </button>
                         <div class="accordion-gold-body" id="list-active"></div>
                     </div>
+                    <div class="accordion-gold-group" id="acc-pending">
+                        <button class="accordion-gold-trigger" type="button" aria-controls="list-pending" aria-expanded="false" data-onclick="a47">
+                            <span class="accordion-title-flex">الاشتراكات المجدولة <span class="counter-badge-gold" id="count-pending">0</span></span>
+                        </button>
+                        <div class="accordion-gold-body" id="list-pending"></div>
+                    </div>
                     <div class="accordion-gold-group" id="acc-expired">
                         <button class="accordion-gold-trigger" type="button" aria-controls="list-expired" aria-expanded="false" data-onclick="a19">
                             <span class="accordion-title-flex">الاشتراكات المنتهية <span class="counter-badge-gold" id="count-expired">0</span></span>
@@ -154,17 +157,19 @@
                     </label>
                     <button class="gold-tool-btn" type="button" data-onclick="a8">إعدادات واتساب</button>
                     <button class="gold-tool-btn" type="button" data-onclick="a12">تحديث البيانات</button>
+                    <button class="gold-tool-btn" type="button" data-content-editor>إدارة محتوى الموقع</button>
                     <button class="gold-tool-btn" type="button" data-report>التقارير الشهرية</button>
                     <button class="gold-tool-btn" type="button" data-password>تغيير كلمة المرور</button>
-                    <button id="logout-btn" class="gold-tool-btn" type="button" data-onclick="a13">قفل اللوحة</button>
+                    <button id="logout-btn" class="gold-tool-btn" type="button" data-onclick="a13">تسجيل الخروج</button>
                 </div>
             </aside>
         </div>
         <nav class="admin-mobile-actions" aria-label="أدوات الإدارة السريعة">
             <a class="gold-tool-btn" href="#members-title">المشتركون</a>
             <button class="gold-tool-btn" type="button" data-report>الحسابات</button>
+            <button class="gold-tool-btn" type="button" data-content-editor>الموقع</button>
             <button class="gold-tool-btn" type="button" data-onclick="a10">النسخ</button>
-            <button class="gold-tool-btn" type="button" data-onclick="a13">قفل</button>
+            <button class="gold-tool-btn" type="button" data-onclick="a13">خروج</button>
         </nav>
     </main>
 
@@ -207,7 +212,8 @@
             <div class="form-gold-group"><label for="name">اسم المشترك</label><input type="text" id="name" placeholder="مثال: يوسف العسال"></div>
             <div class="form-gold-group"><label for="phone">رقم الهاتف (واتساب)</label><input type="tel" id="phone" placeholder="01012345678"></div>
             <div class="form-gold-group"><label for="photo">صورة المشترك (اختياري)</label><input type="file" id="photo" accept="image/*"></div>
-            <div class="form-gold-group"><label for="start-date">تاريخ بداية الاشتراك</label><input type="date" id="start-date"></div>
+            <div class="form-gold-group"><label for="start-date">تاريخ بداية الاشتراك</label><input type="date" id="start-date" data-onchange="a45" required></div>
+            <div class="form-gold-group"><label for="end-date">تاريخ انتهاء الاشتراك</label><input type="date" id="end-date" required></div>
 
             <div class="form-gold-group">
                 <label for="package">نوع الباقة</label><select id="package" data-onchange="a27">
@@ -295,6 +301,8 @@
             <div class="form-gold-group"><label for="edit-custom-price">السعر الإجمالي المخصص (ج.م)</label><input type="number" id="edit-custom-price" step="0.01" inputmode="decimal" min="0" data-oninput="a37"></div>
         </div>
 
+        <div class="form-gold-group"><label for="edit-start-date">تاريخ بداية الاشتراك</label><input type="date" id="edit-start-date" data-onchange="a46" required></div>
+        <div class="form-gold-group"><label for="edit-end-date">تاريخ انتهاء الاشتراك</label><input type="date" id="edit-end-date" required></div>
         <div class="form-gold-group"><label for="edit-price">السعر الإجمالي</label><input type="number" id="edit-price" readonly></div>
         <div class="form-gold-group"><label for="edit-paid">المبلغ المدفوع</label><input type="number" id="edit-paid" step="0.01" inputmode="decimal" data-oninput="a38"></div>
         <div class="form-gold-group"><label for="edit-remaining">المتبقي</label><input type="number" id="edit-remaining" readonly></div>
@@ -310,10 +318,14 @@
             <h3>تسجيل المصروفات</h3>
             <button class="modal-gold-close" aria-label="إغلاق" data-onclick="a40">&times;</button>
         </div>
-        <div class="form-gold-group"><label for="expense-title">بند المصروف</label><input type="text" id="expense-title" placeholder="كهرباء، صيانة، إيجار..."></div>
+        <div class="form-gold-group"><label for="expense-title">بند المصروف</label><input type="text" id="expense-title" maxlength="200" placeholder="كهرباء، صيانة، إيجار..."></div>
         <div class="form-gold-group"><label for="expense-amount">المبلغ (ج.م)</label><input type="number" id="expense-amount" min="0.01" step="0.01" inputmode="decimal" placeholder="المبلغ المنصرف"></div>
         <div class="form-gold-group"><label for="expense-date">تاريخ المصروف</label><input type="date" id="expense-date" required></div>
-        <button class="modal-submit-gold" data-onclick="a41">تسجيل المصروف</button>
+        <input id="expense-id" type="hidden">
+        <div class="backup-actions">
+            <button id="expense-submit" class="modal-submit-gold" type="button" data-onclick="a41">تسجيل المصروف</button>
+            <button id="expense-cancel" class="gold-tool-btn" type="button" hidden>إلغاء التعديل</button>
+        </div>
         <div class="expense-history">
             <h4>المصروفات المسجلة</h4>
             <div id="expenses-list"></div>
@@ -328,6 +340,14 @@
  <p id="backup-result" role="status"></p><div id="backup-list"></div>
  <p class="muted">احتفظ بكلمة مرور النسخة التي كانت مستخدمة عند تنزيلها، فهي مطلوبة لاستعادتها.</p>
 </section></div>
+
+<dialog id="backup-password-dialog" class="admin-dialog" aria-labelledby="backup-password-title">
+    <header class="modal-gold-header"><h2 id="backup-password-title"></h2></header>
+    <form id="backup-password-form" method="dialog">
+        <div class="form-gold-group"><label for="file-password">كلمة مرور النسخة</label><input id="file-password" type="password" autocomplete="off" maxlength="256" required autofocus></div>
+        <div class="backup-actions"><button class="modal-submit-gold" type="submit" value="confirmed">متابعة</button><button class="gold-tool-btn" type="submit" value="cancelled" formnovalidate>إلغاء</button></div>
+    </form>
+</dialog>
 
 <dialog id="password-dialog" class="admin-dialog" aria-labelledby="password-title">
     <header class="modal-gold-header"><h2 id="password-title">تغيير كلمة المرور</h2><button id="password-dismiss" class="modal-gold-close" type="button" aria-label="إغلاق">×</button></header>
@@ -362,7 +382,25 @@
     <div class="report-table"><table><thead><tr><th scope="col">الوقت</th><th scope="col">العملية</th><th scope="col">مرجع السجل</th></tr></thead><tbody id="report-activity"></tbody></table></div>
 </dialog>
 
+<dialog id="site-editor" class="admin-dialog site-editor" aria-labelledby="site-editor-title">
+    <header class="modal-gold-header">
+        <div><h2 id="site-editor-title">إدارة محتوى الموقع</h2><p class="muted">عدّل النصوص والصور والفروع، وعاين المسودة قبل النشر.</p></div>
+        <button id="site-editor-close" type="button" class="modal-gold-close" aria-label="إغلاق">×</button>
+    </header>
+    <p id="site-editor-status" role="status" class="editor-status"></p>
+    <div class="editor-actions editor-commands">
+        <button class="gold-tool-btn" id="site-editor-save" type="button">حفظ المسودة</button>
+        <a class="gold-tool-btn" id="site-editor-preview" href="./?preview=1" target="_blank" rel="noopener">معاينة الموقع</a>
+        <button class="gold-tool-btn" id="site-editor-reload" type="button">تحميل المحتوى المنشور</button>
+    </div>
+    <div id="site-editor-fields"></div>
+    <div class="editor-actions editor-commands">
+        <button id="site-editor-publish" class="primary-gold-btn" type="button">نشر للزوار</button>
+    </div>
+</dialog>
+
+<script src="./assets/vendor/supabase-js-2.119.2.js" defer></script>
 <script src="./assets/qrcode.min.js" defer></script>
-<script type="module" src="./events.js?v=3"></script>
+<script type="module" src="./events.js?v=5"></script>
 </body>
 </html>

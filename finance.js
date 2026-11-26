@@ -1,4 +1,4 @@
-import {accountingDate, piasters, today} from './model.js?v=3';
+import {accountingDate, piasters, today} from './model.js?v=4';
 
 const labels = {
   subscription: 'اشتراك',

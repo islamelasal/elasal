@@ -1,15 +1,15 @@
-import {emptyState, normalize, expired, expiryDate, today, uid, MAX_BYTES, piasters} from './model.js?v=3';
-import {
-  readLocal, writeLocal, localSnapshot, localBackups, readSnapshot,
-  vaultExists, unlockVault, lockVault, changeVaultPassword, exportEncrypted, decryptBackup
-} from './storage.js?v=3';
+import {emptyState, normalize, expired, expiryDate, subscriptionEnd, today, uid, piasters} from './model.js?v=4';
+import {db, unwrap, authFeedback} from './supabase-client.js';
+import {loadAcademy, saveAcademy, makeBackup, listAcademyBackups, loadBackup, linkAccount} from './academy-data.js';
+import {exportEncrypted, decryptBackup} from './legacy-backup.js';
 import {openReport} from './finance.js';
+import {openEditor} from './site-editor.js';
 
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money = n => Number(n).toLocaleString('ar-EG', {maximumFractionDigits: 2}) + ' ج.م';
 const photo = value => value || './assets/avatar.svg';
-let state = emptyState(), revision = 0, unlocked = false, busy = false, creatingVault = false, currentFilter = 'all', activeQrMember = null;
+let state = emptyState(), revision = 0, unlocked = false, busy = false, email = '', currentFilter = 'all', activeQrMember = null;
 let lockTimer;
 let backups = [], lastBackupError = '';
 const show = id => { $(id).style.display = 'flex'; };
@@ -20,7 +20,7 @@ function error(e) { status(e.message || 'تعذر إتمام العملية', tr
 function enter() {
   $('entry-screen').hidden = true;
   $('app').hidden = false;
-  $('storage-status').textContent = 'الحفظ المشفّر على هذا الجهاز';
+  $('storage-status').textContent = 'البيانات محفوظة على Supabase';
   $('manager-img').src = photo(state.managerPhoto);
   setDefaultDate();
   checkPackageSelection();
@@ -28,40 +28,47 @@ function enter() {
   resetLockTimer();
   window.scrollTo(0, 0);
 }
-async function initApp() {
-  changeTheme(localStorage.getItem('elasal_theme') || 'black');
-  creatingVault = !await vaultExists();
-  $('entry-status').textContent = creatingVault ? 'اضبط كلمة مرور لهذا الجهاز' : 'اللوحة مقفلة';
-  $('initial-password-hint').hidden = !creatingVault;
-  $('confirm-password-group').hidden = !creatingVault;
-  $('confirm-password').required = creatingVault;
-  $('admin-password').autocomplete = creatingVault ? 'new-password' : 'current-password';
-  $('unlock-submit').textContent = creatingVault ? 'حفظ كلمة المرور وفتح اللوحة' : 'فتح لوحة الإدارة';
+function initApp() {
+  changeTheme('black');
+  $('entry-status').textContent = 'سجّل الدخول ببريد المدير';
   $('login-form').hidden = false;
+}
+async function signOut() {
+  unlocked = false;
+  clearTimeout(lockTimer);
+  await db.auth.signOut({scope: 'local'});
 }
 async function login() {
   const button = $('unlock-submit');
   button.disabled = true;
   try {
-    const password = $('admin-password').value;
-    if (creatingVault && password !== $('confirm-password').value) throw Error('كلمتا المرور مختلفتان.');
-    ({state, revision} = await unlockVault(password, creatingVault));
-    creatingVault = false;
+    const result = unwrap(await db.auth.signInWithPassword({
+      email: $('admin-email').value.trim(), password: $('admin-password').value
+    }));
+    if (unwrap(await db.rpc('is_academy_admin')) !== true) throw Error('الحساب لا يملك صلاحية الإدارة. استخدم صفحة اشتراكي.');
+    const saved = await loadAcademy();
+    state = normalize(saved.state);
+    revision = saved.revision;
+    email = result.user.email;
     unlocked = true;
     $('login-form').reset();
     enter();
-    await tryLocalSnapshot();
-  } catch (e) {
-    $('entry-status').textContent = e.message;
+  } catch (error) {
+    await signOut();
+    $('entry-status').textContent = authFeedback(error);
+    $('admin-password').value = '';
   } finally {
     button.disabled = false;
   }
 }
-function logout() {
+async function logout() {
   if (busy) { resetLockTimer(); return; }
-  lockVault();
-  location.reload();
+  try { await signOut(); }
+  finally { location.reload(); }
 }
+db.auth.onAuthStateChange(event => {
+  if (event === 'SIGNED_OUT' && unlocked) location.reload();
+});
 function resetLockTimer() {
   if (!unlocked) return;
   clearTimeout(lockTimer);
@@ -70,7 +77,9 @@ function resetLockTimer() {
 async function refreshData() {
   if (busy) return;
   try {
-    ({state, revision} = await readLocal());
+    const saved = await loadAcademy();
+    state = normalize(saved.state);
+    revision = saved.revision;
     render();
     $('manager-img').src = photo(state.managerPhoto);
     status('تم تحميل أحدث بيانات');
@@ -86,12 +95,15 @@ async function commit(next, restore = false) {
   $('app').dataset.busy = 'true';
   status('جارٍ الحفظ');
   try {
-    if (restore) await localSnapshot(state, revision, 'before-restore');
-    revision = await writeLocal(validated, revision);
-    state = validated;
+    revision = await saveAcademy(validated, revision, restore);
+    if (restore) {
+      const saved = await loadAcademy();
+      state = normalize(saved.state);
+      revision = saved.revision;
+    } else state = validated;
     render();
     $('manager-img').src = photo(state.managerPhoto);
-    status('تم الحفظ تلقائيًا على هذا الجهاز');
+    status('تم الحفظ على Supabase');
     await tryLocalSnapshot();
   } finally {
     busy = false;
@@ -117,26 +129,45 @@ async function savePassword(event) {
   busy = true;
   button.disabled = true;
   try {
-    await changeVaultPassword($('current-password').value, $('new-password').value);
+    unwrap(await db.auth.signInWithPassword({email, password: $('current-password').value}));
+    unwrap(await db.auth.updateUser({password: $('new-password').value}));
+    await db.auth.signOut({scope: 'others'});
     form.reset();
     $('password-dialog').close();
-    status('تم تغيير كلمة المرور وإعادة تشفير البيانات والنسخ المحلية.');
+    status('تم تغيير كلمة مرور حساب الإدارة.');
   } catch (e) {
-    $('password-feedback').textContent = e.message;
+    $('password-feedback').textContent = authFeedback(e);
   } finally {
     busy = false;
     button.disabled = false;
   }
 }
 async function tryLocalSnapshot() {
-  try { await localSnapshot(state, revision); lastBackupError = ''; }
-  catch { lastBackupError = 'تعذر إنشاء النسخة المحلية؛ نزّل نسخة على جهازك وتحقق من مساحة المتصفح'; status(lastBackupError, true); }
+  try { await makeBackup(); lastBackupError = ''; }
+  catch { lastBackupError = 'تعذر تحديث نسخة اليوم على Supabase. تقدر تنزّل نسخة مشفّرة يدويًا.'; status(lastBackupError, true); }
 }
 function changeTheme(name) {
   const theme = ['black','blue','red','green'].includes(name) ? name : 'black';
-  document.body.dataset.theme = theme; $('brand-theme').value = theme; localStorage.setItem('elasal_theme', theme);
+  document.body.dataset.theme = theme; $('brand-theme').value = theme;
 }
-function setDefaultDate() { $('start-date').value = today(); }
+function setDefaultDate() {
+  $('start-date').value = today();
+  setPackageEnd();
+}
+function setPackageEnd(prefix = '') {
+  const start = $(prefix + 'start-date').value;
+  if (!start) return;
+  $(prefix + 'end-date').min = subscriptionEnd(start, 1);
+  $(prefix + 'end-date').value = subscriptionEnd(start, readPackage(prefix).validityDays);
+}
+function readSubscriptionDates(prefix = '') {
+  const startDate = $(prefix + 'start-date').value;
+  const endDate = $(prefix + 'end-date').value;
+  if (!startDate || !endDate || endDate <= startDate) {
+    throw Error('اختَر بداية الاشتراك وتاريخ انتهاء بعدها.');
+  }
+  return {startDate, endDate};
+}
 function readPackage(prefix = '') {
   const sel = $(prefix + 'package');
   return sel.value === 'custom' ? {packageType:'custom', totalPrice:Number($(prefix + 'custom-price').value), totalSessions:Number($(prefix + 'custom-sessions').value), validityDays:30} : {
@@ -165,24 +196,24 @@ async function updateManagerPhoto(e) {
 function addPayment(s, memberId, amount, kind) { if (amount) s.payments.push({id:uid(), memberId, amount, date:today(), kind}); }
 async function handleAddMember() {
   try {
-    const newMember = {id:uid(), name:$('name').value.trim(), phone:$('phone').value.trim(), startDate:$('start-date').value, ...readPackage(), paid:Number($('paid').value), debtCarried:0, photo:await compressPhoto($('photo').files[0])};
+    const newMember = {id:uid(), name:$('name').value.trim(), phone:$('phone').value.trim(), subscriptionId:crypto.randomUUID(), ...readSubscriptionDates(), ...readPackage(), paid:Number($('paid').value), debtCarried:0, photo:await compressPhoto($('photo').files[0])};
     newMember.remainingSessions = newMember.totalSessions;
     await mutate('إضافة مشترك', s => { s.members.unshift(newMember); addPayment(s,newMember.id,newMember.paid,'subscription'); }, newMember.id);
     close('modal-add'); for (const id of ['name','phone','paid','remaining','photo']) $(id).value = '';
   } catch (e) { error(e); }
 }
 function render() {
-  const query = $('search-input').value.trim().toLowerCase(), counts = {active:0,expired:0,debts:0};
-  const containers = {active:$('list-active'),expired:$('list-expired'),debts:$('list-debts')};
+  const query = $('search-input').value.trim().toLowerCase(), counts = {active:0,pending:0,expired:0,debts:0};
+  const containers = {active:$('list-active'),pending:$('list-pending'),expired:$('list-expired'),debts:$('list-debts')};
   Object.values(containers).forEach(c => c.replaceChildren());
   for (const m of state.members) {
-    const category = expired(m) ? 'expired':'active', debt = m.remaining > 0;
+    const category = expired(m) ? 'expired' : m.startDate > today() ? 'pending' : 'active', debt = m.remaining > 0;
     counts[category]++; if(debt) counts.debts++;
     if (query && !m.name.toLowerCase().includes(query) && !m.phone.includes(query) && !String(m.id).includes(query)) continue;
     if (currentFilter === 'active' && category !== 'active' || currentFilter === 'debts' && !debt) continue;
     const attended = m.totalSessions - m.remainingSessions;
     const button = (action,label) => `<button class="gold-action-btn" data-action="${action}" data-id="${m.id}">${label}</button>`;
-    const card = `<article class="member-gold-card"><div class="member-gold-top"><img src="${esc(photo(m.photo))}" class="member-gold-avatar" alt="صورة ${esc(m.name)}" data-action="photo" data-id="${m.id}"><div class="member-gold-info"><h4>${esc(m.name)}</h4><p>${esc(m.phone)}</p><div class="tags-gold-row"><span class="gold-status-badge ${category === 'active' ? 'badge-active':'badge-expired'}">${category === 'active' ? 'نشط':'منتهي'}</span><span class="gold-status-badge badge-neutral">المتبقي ${m.remainingSessions} / ${m.totalSessions}</span>${debt ? `<span class="gold-status-badge badge-debt">مستحق ${money(m.remaining)}</span>`:''}</div></div></div><div class="progress-gold-container"><div class="progress-gold-meta"><span>حضر ${attended} حصة</span><span>البداية ${m.startDate} | الانتهاء ${expiryDate(m)}</span></div><div class="progress-gold-line"><div class="progress-gold-fill" style="width:${attended/m.totalSessions*100}%"></div></div></div><div class="card-gold-actions">${button('attend','حضور')}${button('whatsapp','واتساب')}${button('alert','تنبيه تجديد')}${debt ? button('settle','سداد مبلغ')+button('debt','مطالبة'):''}${button('renew','تجديد')}${button('qr','QR')}${button('edit','تعديل')}${button('correct','تصحيح الحصص')}${button('delete','حذف')}</div></article>`;
+    const card = `<article class="member-gold-card"><div class="member-gold-top"><img src="${esc(photo(m.photo))}" class="member-gold-avatar" alt="صورة ${esc(m.name)}" data-action="photo" data-id="${m.id}"><div class="member-gold-info"><h4>${esc(m.name)}</h4><p>${esc(m.phone)}</p><div class="tags-gold-row"><span class="gold-status-badge ${category === 'active' ? 'badge-active' : category === 'pending' ? 'badge-neutral' : 'badge-expired'}">${category === 'active' ? 'نشط' : category === 'pending' ? 'مجدول' : 'منتهي'}</span><span class="gold-status-badge badge-neutral">المتبقي ${m.remainingSessions} / ${m.totalSessions}</span>${debt ? `<span class="gold-status-badge badge-debt">مستحق ${money(m.remaining)}</span>`:''}</div></div></div><div class="progress-gold-container"><div class="progress-gold-meta"><span>حضر ${attended} حصة</span><span>البداية ${m.startDate} | الانتهاء ${expiryDate(m)}</span></div><div class="progress-gold-line"><div class="progress-gold-fill" style="width:${attended/m.totalSessions*100}%"></div></div></div><div class="card-gold-actions">${button('attend','حضور')}${button('whatsapp','واتساب')}${button('alert','تنبيه تجديد')}${debt ? button('settle','سداد مبلغ')+button('debt','مطالبة'):''}${button('renew','تجديد')}${button('qr','QR')}${button('edit','تعديل')}${button('link',m.linked?'تعديل ربط الحساب':'ربط حساب المشترك')}${button('correct','تصحيح الحصص')}${button('delete','حذف')}</div></article>`;
     containers[category].insertAdjacentHTML('beforeend',card); if(debt) containers.debts.insertAdjacentHTML('beforeend',card);
   }
   for (const [kind, container] of Object.entries(containers)) {
@@ -211,33 +242,89 @@ function toggleAccordion(id) {
   const expanded = accordion.classList.toggle('open');
   accordion.querySelector('.accordion-gold-trigger').setAttribute('aria-expanded', String(expanded));
 }
+function resetExpenseForm() {
+  $('expense-id').value = '';
+  $('expense-title').value = '';
+  $('expense-amount').value = '';
+  $('expense-date').value = today();
+  $('expense-submit').textContent = 'تسجيل المصروف';
+  $('expense-cancel').hidden = true;
+}
 function renderExpenses() {
-  const list = $('expenses-list'); list.replaceChildren();
+  const list = $('expenses-list');
+  list.replaceChildren();
   if (!state.expenses.length) { list.textContent = 'لا توجد مصروفات مسجلة'; return; }
-  for (const e of state.expenses) { const row = document.createElement('p'); row.textContent = `${e.title} · ${e.date} · ${money(e.amount)}`; list.append(row); }
+  for (const entry of state.expenses) {
+    const row = document.createElement('div');
+    row.className = 'expense-row';
+    const info = document.createElement('span');
+    info.textContent = `${entry.title} · ${entry.date} · ${money(entry.amount)}`;
+    row.append(info);
+    for (const [action, label] of [['edit', 'تعديل'], ['delete', 'حذف']]) {
+      const control = document.createElement('button');
+      control.type = 'button';
+      control.className = 'gold-tool-btn';
+      control.dataset.expenseAction = action;
+      control.dataset.id = entry.id;
+      control.textContent = label;
+      row.append(control);
+    }
+    list.append(row);
+  }
 }
 async function addExpense() {
-  try { await mutate('تسجيل مصروف', s => s.expenses.unshift({id:uid(),title:$('expense-title').value.trim(),amount:Number($('expense-amount').value),date:$('expense-date').value})); $('expense-title').value = ''; $('expense-amount').value = ''; renderExpenses(); } catch(e) { error(e); }
+  try {
+    const id = Number($('expense-id').value);
+    const expense = {id: id || uid(), title: $('expense-title').value.trim(),
+      amount: Number($('expense-amount').value), date: $('expense-date').value};
+    await mutate(id ? 'تعديل مصروف' : 'تسجيل مصروف', next => {
+      if (id) next.expenses = next.expenses.map(entry => entry.id === id ? expense : entry);
+      else next.expenses.unshift(expense);
+    }, expense.id);
+    resetExpenseForm();
+    renderExpenses();
+  } catch (reason) { error(reason); }
+}
+async function expenseAction(control) {
+  const entry = state.expenses.find(item => item.id === Number(control.dataset.id));
+  if (!entry || busy) return;
+  if (control.dataset.expenseAction === 'edit') {
+    $('expense-id').value = entry.id;
+    $('expense-title').value = entry.title;
+    $('expense-amount').value = entry.amount;
+    $('expense-date').value = entry.date;
+    $('expense-submit').textContent = 'حفظ تعديل المصروف';
+    $('expense-cancel').hidden = false;
+    $('expense-title').focus();
+  } else if (confirm('حذف هذا المصروف من الحسابات؟')) {
+    try {
+      await mutate('حذف مصروف', next => {next.expenses = next.expenses.filter(item => item.id !== entry.id);}, entry.id);
+      resetExpenseForm();
+      renderExpenses();
+    } catch (reason) { error(reason); }
+  }
 }
 async function saveSettings() { try { await mutate('تحديث رقم واتساب الإدارة', s=>s.adminWhatsApp=$('admin-whatsapp').value.trim()); close('modal-settings'); } catch(e) { error(e); } }
 function openEditModal(id) {
   const m=state.members.find(m=>m.id===id); if(!m)return;
   $('edit-id').value=id; $('edit-name').value=m.name; $('edit-phone').value=m.phone; $('edit-package').value=m.packageType; $('edit-custom-sessions').value=m.totalSessions; $('edit-custom-price').value=m.totalPrice; $('edit-photo').value='';
+  $('edit-start-date').value=m.startDate; $('edit-end-date').min=subscriptionEnd(m.startDate,1); $('edit-end-date').value=m.endDate;
   checkPackageSelection('edit-'); $('edit-paid').value=m.paid; $('edit-remaining').value=m.remaining; show('modal-edit');
 }
 async function saveEditedMember() {
   try {
     const id=Number($('edit-id').value), image=await compressPhoto($('edit-photo').files[0]);
+    const dates = readSubscriptionDates('edit-');
     await mutate('تعديل مشترك', s=>{
       const m=s.members.find(x=>x.id===id), pkg=readPackage('edit-'), attended=m.totalSessions-m.remainingSessions, delta=(piasters(Number($('edit-paid').value))-piasters(m.paid))/100;
       m.name=$('edit-name').value.trim(); m.phone=$('edit-phone').value.trim();
       if(image)m.photo=image;
-      Object.assign(m,pkg); m.remainingSessions=Math.max(0,pkg.totalSessions-attended); m.paid=Number($('edit-paid').value); addPayment(s,id,delta,'adjustment');
+      Object.assign(m,pkg,dates); m.remainingSessions=Math.max(0,pkg.totalSessions-attended); m.paid=Number($('edit-paid').value); addPayment(s,id,delta,'adjustment');
     }, id); close('modal-edit');
   } catch(e) { error(e); }
 }
 async function attendSession(id) {
-  const m=state.members.find(m=>m.id===id); if(!m || expired(m)) { alert('الاشتراك منتهٍ أو لا توجد حصص متاحة'); return; }
+  const m=state.members.find(m=>m.id===id); if(!m || expired(m) || m.startDate > today()) { alert('الاشتراك غير نشط اليوم أو لا توجد حصص متاحة'); return; }
   if(!confirm(`تسجيل حضور ${m.name} وخصم حصة؟`))return;
   try { await mutate('تسجيل حضور', s=>s.members.find(m=>m.id===id).remainingSessions--, id); } catch(e) { error(e); }
 }
@@ -247,12 +334,23 @@ async function correctSessions(id) {
 }
 async function renew(id) {
   const m=state.members.find(m=>m.id===id), value=prompt(`تجديد ${m.name}. سعر الباقة ${money(m.totalPrice)} والمستحق السابق ${money(m.remaining)}. أدخل المبلغ المقبوض الآن؛ صفر للتجديد دون سداد:`, '0'); if(value===null)return;
-  try { await mutate('تجديد اشتراك', s=>{ const m=s.members.find(m=>m.id===id); m.debtCarried=m.remaining; m.paid=Number(value); m.remainingSessions=m.totalSessions; m.startDate=today(); addPayment(s,id,m.paid,'renewal'); }, id); } catch(e) { error(e); }
+  try { await mutate('تجديد اشتراك', s=>{ const m=s.members.find(m=>m.id===id); m.debtCarried=m.remaining; m.paid=Number(value); m.remainingSessions=m.totalSessions; m.startDate=today(); m.endDate=subscriptionEnd(m.startDate,m.validityDays); m.subscriptionId=crypto.randomUUID(); addPayment(s,id,m.paid,'renewal'); }, id); } catch(e) { error(e); }
 }
 async function settle(id) {
   const m=state.members.find(m=>m.id===id), value=prompt(`المستحق ${money(m.remaining)}. المبلغ المقبوض:`, String(m.remaining)); if(value===null)return;
   const amount=Number(value); if(!Number.isFinite(amount)||amount<=0||amount>m.remaining){alert('أدخل مبلغًا موجبًا لا يتجاوز المستحق');return;}
   try { await mutate('تسجيل سداد', s=>{const member=s.members.find(m=>m.id===id);member.paid=(piasters(member.paid)+piasters(amount))/100;addPayment(s,id,amount,'settlement');}, id); } catch(e) { error(e); }
+}
+async function linkMember(id) {
+  const address = prompt('أدخل البريد المؤكّد في Supabase Auth. اتركه فارغًا لفصل الحساب.');
+  if (address === null) return;
+  const target = address.trim();
+  if (!target && !confirm('فصل الحساب من هذا العضو؟')) return;
+  try {
+    await linkAccount(id, target || null);
+    await refreshData();
+    status(target ? 'تم ربط الحساب بالعضو.' : 'تم فصل الحساب عن العضو.');
+  } catch (error) { status(error.message, true); }
 }
 async function deleteMember(id) {
   if(!confirm('حذف العضو؟ ستبقى المقبوضات السابقة في الإجمالي المالي.'))return;
@@ -276,11 +374,29 @@ async function checksum(value) { return [...new Uint8Array(await crypto.subtle.d
 function download(value,name) {
   const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'})), a=document.createElement('a'); a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
+function askBackupPassword(title) {
+  const dialog = $('backup-password-dialog');
+  const form = $('backup-password-form');
+  $('backup-password-title').textContent = title;
+  dialog.returnValue = '';
+  form.reset();
+  return new Promise(resolve => {
+    dialog.addEventListener('close', () => {
+      const password = dialog.returnValue === 'confirmed' ? $('file-password').value : null;
+      form.reset();
+      resolve(password);
+    }, {once: true});
+    dialog.showModal();
+  });
+}
 async function exportData() {
-  try { download(await exportEncrypted(state),'elasal-backup-'+today()+'.json'); } catch(e) { error(e); }
+  try {
+    const password = await askBackupPassword('اختر كلمة مرور للنسخة المشفّرة.');
+    if (password !== null) download(await exportEncrypted(state, password),'elasal-backup-'+today()+'.json');
+  } catch(e) { error(e); }
 }
 async function restoreData(raw) {
-  raw = await decryptBackup(raw, () => prompt('أدخل كلمة مرور ملف النسخة الاحتياطية.'));
+  raw = await decryptBackup(raw, () => askBackupPassword('أدخل كلمة مرور ملف النسخة الاحتياطية.'));
   if (raw === null) return;
   if(raw.format==='elasal-backup' && (!raw.checksum || await checksum(JSON.stringify(raw.state))!==raw.checksum))throw Error('فشل التحقق من سلامة ملف النسخة');
   // Compress legacy inline photos before strict validation. Remote photos are discarded.
@@ -299,11 +415,11 @@ async function importData(e) {
 }
 async function openBackups() {
   show('modal-backups');
-  $('backup-policy').textContent = 'تُحدّث نسخة اليوم المشفّرة عند حفظ البيانات، وتبقى النسخ المحلية 30 يومًا. نزّل نسخة مشفّرة لحفظها خارج المتصفح.';
+  $('backup-policy').textContent = 'تُحدّث نسخة اليوم على Supabase عند الحفظ في اللوحة. احتفظ بملف مشفّر خارج المنصة.';
   try { await listBackups(); } catch(e){$('backup-result').textContent=e.message;$('backup-result').dataset.error='true';}
 }
 async function listBackups() {
-  backups=await localBackups();
+  backups=await listAcademyBackups();
   const list=$('backup-list'); list.replaceChildren(); $('backup-result').textContent=lastBackupError||`${backups.length} نسخة متاحة`;
   for(let i=0;i<backups.length;i++) {
     const b=backups[i],row=document.createElement('div');row.className='backup-row';
@@ -314,43 +430,56 @@ async function listBackups() {
   }
 }
 async function createBackup() {
-  try { await localSnapshot(state,revision,'manual'); await listBackups(); $('backup-result').textContent='تم حفظ نسخة اليوم'; }catch(e){error(e);}
+  try { await makeBackup('manual'); await listBackups(); $('backup-result').textContent='تم حفظ نسخة اليوم'; }catch(e){error(e);}
 }
 document.addEventListener('click',async event=>{
-  if (event.target.closest('[data-report]')) openReport(() => state);
+  if (unlocked && event.target.closest('[data-report]')) openReport(() => state);
+  if (unlocked && event.target.closest('[data-content-editor]')) openEditor();
   if (event.target.closest('[data-password]')) {
     $('password-feedback').textContent = '';
     $('password-dialog').showModal();
   }
   const b=event.target.closest('[data-action]');
   if(b){
-    const id=Number(b.dataset.id),actions={attend:attendSession,whatsapp:id=>whatsapp(id),alert:id=>whatsapp(id,'alert'),debt:id=>whatsapp(id,'debt'),settle,renew,qr:openQrModal,edit:openEditModal,correct:correctSessions,delete:deleteMember,photo:id=>viewLargeImage(photo(state.members.find(m=>m.id===id).photo))};
+    const id=Number(b.dataset.id),actions={attend:attendSession,whatsapp:id=>whatsapp(id),alert:id=>whatsapp(id,'alert'),debt:id=>whatsapp(id,'debt'),settle,renew,link:linkMember,qr:openQrModal,edit:openEditModal,correct:correctSessions,delete:deleteMember,photo:id=>viewLargeImage(photo(state.members.find(m=>m.id===id).photo))};
     if(!busy&&actions[b.dataset.action])await actions[b.dataset.action](id);
   }
+  const expenseButton = event.target.closest('[data-expense-action]');
+  if (expenseButton) await expenseAction(expenseButton);
   const backupButton=event.target.closest('[data-backup-action]');
   if(backupButton){
-    try { const b=backups[Number(backupButton.dataset.index)],value=await readSnapshot(b); if(backupButton.dataset.backupAction==='download')download(await exportEncrypted(value),'elasal-'+b.id.replace(/:/g,'-')+'.json');else await restoreData(value); }catch(e){error(e);}
+    try {
+      const b = backups[Number(backupButton.dataset.index)];
+      if (!b) return;
+      const value = await loadBackup(b.id);
+      if (backupButton.dataset.backupAction === 'download') {
+        const password = await askBackupPassword('اختر كلمة مرور للنسخة المشفّرة.');
+        if (password !== null) download(await exportEncrypted(value, password), 'elasal-' + b.id.replace(/:/g, '-') + '.json');
+      } else await restoreData(value);
+    } catch(e) { error(e); }
   }
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
+    if (document.querySelector('dialog[open]')) return;
     document.querySelectorAll('.modal-gold-overlay').forEach(el => el.style.display = 'none');
     close('modal-img-viewer');
   }
 });
+document.getElementById('expense-cancel').addEventListener('click', resetExpenseForm);
 document.getElementById('password-change-form').addEventListener('submit', savePassword);
 document.getElementById('password-dismiss').addEventListener('click', () => {
   $('password-change-form').reset();
   $('password-dialog').close();
 });
 for (const event of ['pointerdown', 'keydown']) document.addEventListener(event, resetLockTimer);
-window.addEventListener('offline', () => { if (unlocked) status('الحفظ المحلي متاح أثناء فتح اللوحة.'); });
+window.addEventListener('offline', () => { if (unlocked) status('انقطع الاتصال. يلزم الإنترنت لحفظ التعديلات.'); });
 setInterval(() => { if (unlocked && !busy) tryLocalSnapshot(); }, 3600000);
 Object.assign(window,{initApp,render,login,logout,refreshData,changeTheme,
   setFilter,toggleAccordion,openAddMemberModal:()=>{setDefaultDate();checkPackageSelection();show('modal-add');},closeAddMemberModal:()=>close('modal-add'),
   openSettingsModal:()=>{$('admin-whatsapp').value=state.adminWhatsApp;show('modal-settings');},closeSettingsModal:()=>close('modal-settings'),saveSettings,
-  checkPackageSelection:()=>checkPackageSelection(),calcCustomPrice:()=>checkPackageSelection(),calcRemaining:()=>calcRemaining(),checkEditPackageSelection:()=>checkPackageSelection('edit-'),calcEditCustomPrice:()=>checkPackageSelection('edit-'),calcEditRemaining:()=>calcRemaining('edit-'),
-  handleAddMember,updateManagerPhoto,openEditModal,saveEditedMember,closeEditModal:()=>close('modal-edit'),openExpenseModal:()=>{$('expense-date').value=today();renderExpenses();show('modal-expense');},closeExpenseModal:()=>close('modal-expense'),addExpense,
+  setPackageEnd,checkPackageSelection:()=>{checkPackageSelection();setPackageEnd();},calcCustomPrice:()=>checkPackageSelection(),calcRemaining:()=>calcRemaining(),checkEditPackageSelection:()=>{checkPackageSelection('edit-');setPackageEnd('edit-');},calcEditCustomPrice:()=>checkPackageSelection('edit-'),calcEditRemaining:()=>calcRemaining('edit-'),
+  handleAddMember,updateManagerPhoto,openEditModal,saveEditedMember,closeEditModal:()=>close('modal-edit'),openExpenseModal:()=>{resetExpenseForm();renderExpenses();show('modal-expense');},closeExpenseModal:()=>close('modal-expense'),addExpense,
   viewLargeImage,closeLargeImageViewer:()=>close('modal-img-viewer'),closeQrModal:()=>close('modal-qr'),viewQrImageFullSize,sendQrWhatsApp:()=>activeQrMember&&whatsapp(activeQrMember.id,'qr'),
   exportData,importData,openBackups,closeBackups:()=>close('modal-backups'),createBackup});
-initApp().catch(e=>{$('entry-status').textContent=e.message;});
+initApp();

@@ -3,72 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://prnwlfzwoqpozwddpmxo.supabase.co; connect-src 'self' https://prnwlfzwoqpozwddpmxo.supabase.co; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
     <meta name="referrer" content="no-referrer">
     <meta name="theme-color" content="#111011">
-    <meta name="description" content="تدريب ملاكمة فردي وجماعي مع الكابتن محمد العسال في مدينة نصر. تعرّف على التدريب والفروع وطرق الحجز.">
-    <title>أكاديمية العسال للملاكمة | مدينة نصر</title>
+    <meta name="description" content="تدريب ملاكمة فردي وجماعي مع الكابتن محمد العسال في مدينة نصر. تعرّف على التدريب والفروع وطرق الحجز." data-description="indexDescription">
+    <title data-copy="indexTitle">أكاديمية العسال للملاكمة | مدينة نصر</title>
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="./assets/base.css?v=2">
-    <link rel="stylesheet" href="./assets/site.css?v=3">
+    <link rel="stylesheet" href="./assets/site.css?v=4">
 </head>
 <body>
     <a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
     <div class="public-shell">
         <header class="public-header">
-            <a class="public-logo" href="./" aria-label="أكاديمية العسال للملاكمة، الصفحة الرئيسية">
-                <img src="./assets/elasal-logo.webp" width="1200" height="300" alt="">
+            <a class="public-logo" href="./" aria-label="أكاديمية العسال للملاكمة، الصفحة الرئيسية" data-home-label="1">
+                <img src="./assets/elasal-logo.webp" width="1200" height="300" alt="" data-media="logo">
             </a>
             <nav class="public-nav" aria-label="القائمة الرئيسية">
-                <a href="./" aria-current="page">الرئيسية</a>
-                <a href="./training.html">التدريب</a>
-                <a href="./gallery.html">معرض الصور</a>
-                <a href="./contact.html">الفروع والتواصل</a>
+                <a href="./" aria-current="page" data-copy="navHome">الرئيسية</a>
+                <a href="./training.html" data-copy="navTraining">التدريب</a>
+                <a href="./gallery.html" data-copy="navGallery">معرض الصور</a>
+                <a href="./contact.html" data-copy="navContact">الفروع والتواصل</a>
+                <a href="./member.html" data-copy="navMember">اشتراكي</a>
             </nav>
-            <a class="gold-tool-btn admin-link" href="./admin.html">لوحة الإدارة</a>
+            <a class="gold-tool-btn admin-link" href="./admin.html" data-copy="navAdmin">لوحة الإدارة</a>
         </header>
         <main id="main">
             <section class="public-hero">
                 <div class="public-hero-copy">
-                    <p class="location-kicker">مدينة نصر، القاهرة</p>
-                    <h1>أكاديمية العسال <span>للملاكمة</span></h1>
-                    <p class="public-lead">تدريب ملاكمة فردي وجماعي مع الكابتن محمد العسال.</p>
+                    <p class="location-kicker" data-copy="homeKicker">مدينة نصر، القاهرة</p>
+                    <h1><span data-copy="indexHeading">أكاديمية العسال</span> <span data-copy="indexAccent">للملاكمة</span></h1>
+                    <p class="public-lead" data-copy="indexLead">تدريب ملاكمة فردي وجماعي مع الكابتن محمد العسال.</p>
                     <div class="public-actions">
-                        <a class="primary-gold-btn" href="./training.html">استكشف التدريب</a>
-                        <a class="gold-tool-btn" href="https://wa.me/201004969332?text=%D9%85%D8%B1%D8%AD%D8%A8%D9%8B%D8%A7%D8%8C%20%D8%B9%D9%86%D8%AF%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A3%D9%83%D8%A7%D8%AF%D9%8A%D9%85%D9%8A%D8%A9%20%D8%A7%D9%84%D8%B9%D8%B3%D8%A7%D9%84%20%D9%88%D8%A7%D9%84%D8%AD%D8%AC%D8%B2%D8%8C%20%D9%84%D9%88%20%D8%B3%D9%85%D8%AD%D8%AA." data-contact="whatsapp" data-inquiry="أكاديمية العسال والحجز"><img class="contact-icon" src="./assets/whatsapp.svg" width="23" height="23" alt="">احجز عبر واتساب</a>
+                        <a class="primary-gold-btn" href="./training.html" data-copy="homeTrainingLink">استكشف التدريب</a>
+                        <a class="gold-tool-btn" href="https://wa.me/201004969332?text=%D9%85%D8%B1%D8%AD%D8%A8%D9%8B%D8%A7%D8%8C%20%D8%B9%D9%86%D8%AF%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A3%D9%83%D8%A7%D8%AF%D9%8A%D9%85%D9%8A%D8%A9%20%D8%A7%D9%84%D8%B9%D8%B3%D8%A7%D9%84%20%D9%88%D8%A7%D9%84%D8%AD%D8%AC%D8%B2%D8%8C%20%D9%84%D9%88%20%D8%B3%D9%85%D8%AD%D8%AA." data-contact="whatsapp" data-inquiry="أكاديمية العسال والحجز" data-inquiry-key="indexInquiry"><img class="contact-icon" src="./assets/whatsapp.svg" width="23" height="23" alt=""><span data-copy="homeBooking">احجز عبر واتساب</span></a>
                     </div>
                 </div>
                 <figure class="public-hero-image">
-                    <img src="./assets/coach.webp" width="1200" height="900" alt="الكابتن محمد العسال" fetchpriority="high">
+                    <img src="./assets/coach.webp" width="1200" height="900" alt="الكابتن محمد العسال" fetchpriority="high" data-media="home">
                 </figure>
             </section>
 
             <section class="public-section" aria-labelledby="home-training">
-                <h2 id="home-training">اختار التدريب المناسب ليك</h2>
+                <h2 id="home-training" data-copy="homeTrainingHeading">اختار التدريب المناسب ليك</h2>
                 <div class="public-grid">
                     <a class="link-panel" href="./training.html#individual">
-                        <div><h3>التدريب الفردي</h3><p>جلسات تركّز على مستواك وأهدافك.</p></div>
+                        <div><h3 data-copy="individual">التدريب الفردي</h3><p data-copy="individualShort">جلسات تركّز على مستواك وأهدافك.</p></div>
                         <span aria-hidden="true">←</span>
                     </a>
                     <a class="link-panel" href="./training.html#groups">
-                        <div><h3>التدريب الجماعي</h3><p>تدرّب مع المجموعة وطوّر لياقتك ومهاراتك.</p></div>
+                        <div><h3 data-copy="groups">التدريب الجماعي</h3><p data-copy="groupsShort">تدرّب مع المجموعة وطوّر لياقتك ومهاراتك.</p></div>
                         <span aria-hidden="true">←</span>
                     </a>
                 </div>
             </section>
             <section class="public-callout" aria-labelledby="home-branches">
-                <div><h2 id="home-branches">فروع الأكاديمية</h2><p>الحي السابع والحي الثامن في مدينة نصر.</p></div>
-                <a class="gold-tool-btn" href="./contact.html">العناوين وطرق التواصل</a>
+                <div><h2 id="home-branches" data-copy="homeBranchesHeading">فروع الأكاديمية</h2><p data-copy="homeBranchesLine">الحي السابع والحي الثامن في مدينة نصر.</p></div>
+                <a class="gold-tool-btn" href="./contact.html" data-copy="homeBranchesLink">العناوين وطرق التواصل</a>
             </section>
         </main>
         <footer class="public-footer">
-            <span>أكاديمية العسال للملاكمة</span>
-            <a href="./contact.html">مدينة نصر، القاهرة</a>
+            <span data-copy="academy">أكاديمية العسال للملاكمة</span>
+            <a href="./contact.html" data-copy="city">مدينة نصر، القاهرة</a>
         </footer>
         <nav class="quick-contact" aria-label="الحجز والاستفسار">
-            <a class="gold-tool-btn" href="https://wa.me/201004969332?text=%D9%85%D8%B1%D8%AD%D8%A8%D9%8B%D8%A7%D8%8C%20%D8%B9%D9%86%D8%AF%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A3%D9%83%D8%A7%D8%AF%D9%8A%D9%85%D9%8A%D8%A9%20%D8%A7%D9%84%D8%B9%D8%B3%D8%A7%D9%84%20%D9%88%D8%A7%D9%84%D8%AD%D8%AC%D8%B2%D8%8C%20%D9%84%D9%88%20%D8%B3%D9%85%D8%AD%D8%AA." data-contact="whatsapp" data-inquiry="أكاديمية العسال والحجز"><img class="contact-icon" src="./assets/whatsapp.svg" width="23" height="23" alt=""><span>واتساب</span></a>
-            <a class="gold-tool-btn" href="tel:+201004969332" data-contact="phone" aria-label="اتصال للاستفسار عن أكاديمية العسال والحجز"><img class="contact-icon" src="./assets/phone.svg" width="23" height="23" alt=""><span>اتصال</span></a>
+            <a class="gold-tool-btn" href="https://wa.me/201004969332?text=%D9%85%D8%B1%D8%AD%D8%A8%D9%8B%D8%A7%D8%8C%20%D8%B9%D9%86%D8%AF%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A3%D9%83%D8%A7%D8%AF%D9%8A%D9%85%D9%8A%D8%A9%20%D8%A7%D9%84%D8%B9%D8%B3%D8%A7%D9%84%20%D9%88%D8%A7%D9%84%D8%AD%D8%AC%D8%B2%D8%8C%20%D9%84%D9%88%20%D8%B3%D9%85%D8%AD%D8%AA." data-contact="whatsapp" data-inquiry="أكاديمية العسال والحجز" data-inquiry-key="indexInquiry"><img class="contact-icon" src="./assets/whatsapp.svg" width="23" height="23" alt=""><span data-copy="quickWhatsApp">واتساب</span></a>
+            <a class="gold-tool-btn" href="tel:+201004969332" data-contact="phone" aria-label="اتصال للاستفسار عن أكاديمية العسال والحجز"><img class="contact-icon" src="./assets/phone.svg" width="23" height="23" alt=""><span data-copy="quickPhone">اتصال</span></a>
         </nav>
     </div>
+<script type="module" src="./site.js?v=5"></script>
 </body>
 </html>

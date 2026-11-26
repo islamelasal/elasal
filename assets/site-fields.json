@@ -1,0 +1,252 @@
+{
+  "الهوية والقائمة": [
+    [
+      "navHome",
+      "الرئيسية"
+    ],
+    [
+      "navTraining",
+      "التدريب"
+    ],
+    [
+      "navGallery",
+      "معرض الصور"
+    ],
+    [
+      "navContact",
+      "الفروع والتواصل"
+    ],
+    [
+      "navAdmin",
+      "اسم رابط الإدارة"
+    ],
+    [
+      "academy",
+      "اسم الأكاديمية"
+    ],
+    [
+      "city",
+      "المدينة أو المنطقة"
+    ],
+    [
+      "quickWhatsApp",
+      "زر واتساب السريع"
+    ],
+    [
+      "quickPhone",
+      "زر الاتصال السريع"
+    ],
+    [
+      "navMember",
+      "رابط حسابات المشتركين"
+    ]
+  ],
+  "الصفحة الرئيسية": [
+    [
+      "indexTitle",
+      "عنوان التبويب"
+    ],
+    [
+      "indexDescription",
+      "وصف الصفحة لمحركات البحث"
+    ],
+    [
+      "indexHeading",
+      "العنوان الرئيسي"
+    ],
+    [
+      "indexAccent",
+      "الجزء المميز من العنوان"
+    ],
+    [
+      "indexLead",
+      "النص التعريفي"
+    ],
+    [
+      "indexInquiry",
+      "موضوع رسالة واتساب"
+    ],
+    [
+      "homeKicker",
+      "الموقع أعلى العنوان"
+    ],
+    [
+      "homeTrainingLink",
+      "زر استكشاف التدريب"
+    ],
+    [
+      "homeBooking",
+      "زر الحجز"
+    ],
+    [
+      "homeTrainingHeading",
+      "عنوان طرق التدريب"
+    ],
+    [
+      "individual",
+      "اسم التدريب الفردي"
+    ],
+    [
+      "individualShort",
+      "الوصف المختصر الفردي"
+    ],
+    [
+      "groups",
+      "اسم التدريب الجماعي"
+    ],
+    [
+      "groupsShort",
+      "الوصف المختصر الجماعي"
+    ],
+    [
+      "homeBranchesHeading",
+      "عنوان صندوق الفروع"
+    ],
+    [
+      "homeBranchesLine",
+      "وصف صندوق الفروع"
+    ],
+    [
+      "homeBranchesLink",
+      "زر الفروع"
+    ]
+  ],
+  "صفحة التدريب": [
+    [
+      "trainingTitle",
+      "عنوان التبويب"
+    ],
+    [
+      "trainingDescription",
+      "وصف الصفحة لمحركات البحث"
+    ],
+    [
+      "trainingHeading",
+      "العنوان الرئيسي"
+    ],
+    [
+      "trainingAccent",
+      "الجزء المميز من العنوان"
+    ],
+    [
+      "trainingLead",
+      "النص التعريفي"
+    ],
+    [
+      "trainingInquiry",
+      "موضوع رسالة واتساب"
+    ],
+    [
+      "trainingBooking",
+      "زر الحجز والمواعيد"
+    ],
+    [
+      "programsHeading",
+      "عنوان طرق التدريب"
+    ],
+    [
+      "individualDetail",
+      "تفاصيل التدريب الفردي"
+    ],
+    [
+      "individualInquire",
+      "زر استفسار الفردي"
+    ],
+    [
+      "groupsDetail",
+      "تفاصيل التدريب الجماعي"
+    ],
+    [
+      "groupsInquire",
+      "زر استفسار الجماعي"
+    ]
+  ],
+  "معرض الصور": [
+    [
+      "galleryTitle",
+      "عنوان التبويب"
+    ],
+    [
+      "galleryDescription",
+      "وصف الصفحة لمحركات البحث"
+    ],
+    [
+      "galleryHeading",
+      "العنوان الرئيسي"
+    ],
+    [
+      "galleryAccent",
+      "الجزء المميز من العنوان"
+    ],
+    [
+      "galleryLead",
+      "النص التعريفي"
+    ],
+    [
+      "galleryInquiry",
+      "موضوع رسالة واتساب"
+    ],
+    [
+      "photoBack",
+      "الرجوع للمعرض"
+    ],
+    [
+      "photoPrev",
+      "الصورة السابقة"
+    ],
+    [
+      "photoNext",
+      "الصورة التالية"
+    ]
+  ],
+  "الفروع والتواصل": [
+    [
+      "contactTitle",
+      "عنوان التبويب"
+    ],
+    [
+      "contactDescription",
+      "وصف الصفحة لمحركات البحث"
+    ],
+    [
+      "contactHeading",
+      "العنوان الرئيسي"
+    ],
+    [
+      "contactAccent",
+      "الجزء المميز من العنوان"
+    ],
+    [
+      "contactLead",
+      "النص التعريفي"
+    ],
+    [
+      "contactInquiry",
+      "موضوع رسالة واتساب"
+    ],
+    [
+      "contactCall",
+      "نص زر الاتصال"
+    ],
+    [
+      "contactWhatsApp",
+      "نص زر واتساب"
+    ],
+    [
+      "branchesHeading",
+      "عنوان قسم الفروع"
+    ],
+    [
+      "branchMap",
+      "زر الخريطة"
+    ],
+    [
+      "branchWhatsApp",
+      "زر واتساب للفرع"
+    ],
+    [
+      "branchPhone",
+      "زر الاتصال بالفرع"
+    ]
+  ]
+}

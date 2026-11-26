@@ -6,11 +6,12 @@ export const piasters = value => Math.round(value * 100);
 export function today(date = new Date()) {
   return new Intl.DateTimeFormat('en-CA', {timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit'}).format(date);
 }
-export function expiryDate(member) {
-  const d = new Date(member.startDate + 'T12:00:00Z');
-  d.setUTCDate(d.getUTCDate() + member.validityDays);
+export function subscriptionEnd(startDate, days) {
+  const d = new Date(startDate + 'T12:00:00Z');
+  d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
 }
+export const expiryDate = member => member.endDate || subscriptionEnd(member.startDate, member.validityDays);
 export const expired = m => today() >= expiryDate(m) || m.remainingSessions <= 0;
 export const uid = () => Date.now() * 1000 + Math.floor(Math.random() * 1000);
 function text(v, max, required = false) {
@@ -60,17 +61,24 @@ export function normalize(input) {
     if (!['p5','p8','p12','p24','g1','g3','g6','g12','custom'].includes(packageType)) throw Error('باقة غير صالحة');
     const phone = text(m.phone, 25, true);
     if (!/^[+\d ()-]{7,25}$/.test(phone)) throw Error('رقم الهاتف غير صالح؛ استخدم الأرقام الإنجليزية');
+    const startDate = date(m.startDate);
+    const endDate = m.endDate ? date(m.endDate) : subscriptionEnd(startDate, number(m.validityDays ?? 30, 1, 3650, true));
+    const validityDays = number((Date.parse(endDate) - Date.parse(startDate)) / DAY, 1, 3650, true);
+    const subscriptionId = m.subscriptionId || null;
+    if (subscriptionId !== null && (typeof subscriptionId !== 'string' || !/^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/i.test(subscriptionId))) {
+      throw Error('معرّف اشتراك غير صالح.');
+    }
     return {id: number(m.id, 1, Number.MAX_SAFE_INTEGER, true), name: text(m.name, 100, true), phone,
-      photo: safePhoto(m.photo), startDate: date(m.startDate), packageType, totalPrice, debtCarried, paid,
+      photo: safePhoto(m.photo), startDate, endDate, subscriptionId, linked: m.linked === true, packageType, totalPrice, debtCarried, paid,
       remaining: (due - piasters(paid)) / 100,
-      totalSessions, remainingSessions: number(m.remainingSessions, 0, totalSessions, true), validityDays: number(m.validityDays ?? 30, 1, 3650, true)};
+      totalSessions, remainingSessions: number(m.remainingSessions, 0, totalSessions, true), validityDays};
   }));
   const expenses = unique(list(s.expenses ?? [], 10_000).map(e => {
     const originalDate = text(e.date, 40, true);
     return {id: number(e.id, 1, Number.MAX_SAFE_INTEGER, true), title: text(e.title, 200, true), amount: number(e.amount, 0.01, 10_000_000), date: accountingDate(originalDate) || originalDate};
   }));
   const opening = members.filter(m => m.paid > 0).map(m => ({id: m.id, memberId: m.id, amount: m.paid, date: m.startDate, kind: 'opening'}));
-  const payments = unique(list(legacy ? opening : s.payments, 10_000).map(p => ({id: number(p.id, 1, Number.MAX_SAFE_INTEGER, true), memberId: number(p.memberId, 1, Number.MAX_SAFE_INTEGER, true), amount: number(p.amount, -10_000_000, 10_000_000), date: date(p.date), kind: text(p.kind, 30, true)})));
+  const payments = unique(list(legacy ? opening : s.payments, 10_000).map(p => ({id: number(p.id, 1, Number.MAX_SAFE_INTEGER, true), memberId: number(p.memberId, 1, Number.MAX_SAFE_INTEGER, true), amount: number(p.amount, -20_000_000, 20_000_000), date: date(p.date), kind: text(p.kind, 30, true)})));
   const audit = unique(list(s.audit ?? [], 10_000).map(entry => ({
     id: text(entry.id, 50, true), action: text(entry.action, 80, true),
     subject: text(entry.subject ?? '', 100), at: text(entry.at, 30, true)

@@ -442,8 +442,6 @@ body[data-theme="green"] {
     .tool-list { grid-template-columns: minmax(0, 1fr); }
 }
 
-#confirm-password-group { margin-block: 12px 0; }
-#initial-password-hint { margin-block-start: 0; }
 #password-feedback, #report-undated { color: var(--danger); }
 #password-feedback:empty, #report-undated:empty { display: none; }
 
@@ -495,3 +493,56 @@ body[data-theme="green"] {
     .finance-report .report-tools, .finance-report #report-close { display: none; }
     .finance-report tr { break-inside: avoid; }
 }
+
+.site-editor { width: min(96vw, 940px); }
+.site-editor header .muted { margin: 2px 0 0; }
+.editor-status { margin-block: 8px 10px; color: var(--success); font-size: .9rem; overflow-wrap: anywhere; }
+.editor-status[data-error="true"] { color: var(--danger); }
+.editor-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.editor-commands { margin-block-end: 14px; }
+.editor-actions a { text-decoration: none; }
+.editor-section { margin-block-end: 9px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--field); }
+.editor-section summary { padding: 10px 13px; font-weight: 700; color: var(--text-main); }
+.editor-section[open] summary { border-bottom: 1px solid var(--border-color); color: var(--primary); }
+.editor-section-body { display: grid; gap: 10px; padding: 12px; }
+.editor-section-body > .gold-tool-btn { justify-self: start; }
+.editor-field { display: grid; gap: 4px; color: var(--text-muted); font-size: .87rem; width: 100%; overflow-wrap: anywhere; }
+.editor-field input, .editor-field textarea { width: 100%; }
+.editor-field textarea {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--field);
+    color: var(--text-main);
+    font: inherit;
+    padding: 8px 12px;
+    min-height: 72px;
+    resize: vertical;
+}
+.editor-field input[type="file"] { max-width: 100%; padding-block: 5px; }
+.editor-list { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.editor-row {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--surface-card);
+}
+.editor-row .editor-actions .gold-tool-btn { font-size: .83rem; min-height: 40px; }
+.editor-thumbnail { max-height: 148px; width: 100%; object-fit: contain; border-radius: var(--radius-sm); background: var(--field); }
+#site-editor-publish { margin-block-start: 8px; }
+
+@media (max-width: 610px) {
+    .editor-list { grid-template-columns: minmax(0, 1fr); }
+    .editor-commands > * { flex: 1 1 115px; }
+}
+
+.subscriber-panel { max-width: 720px; margin: 24px auto; }
+.subscriber-panel a, #entry-screen .muted a { color: var(--primary); }
+.subscriber-subscriptions { display: grid; gap: 12px; margin-block: 14px; }
+.subscriber-facts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 7px 12px; margin: 0; }
+.subscriber-facts dt { color: var(--text-muted); }
+.subscriber-facts dd { margin: 0; overflow-wrap: anywhere; font-weight: 700; }
+.expense-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+.expense-row span { flex: 1 1 130px; overflow-wrap: anywhere; }
+.expense-row button { min-height: 38px; font-size: .84rem; }

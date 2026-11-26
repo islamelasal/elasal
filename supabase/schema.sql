@@ -349,6 +349,10 @@ begin
   end if;
   update public.members set auth_user_id = account where id = p_member_id;
   if not found then raise exception 'Member not found' using errcode = 'P0002'; end if;
+  insert into public.academy_audit (id, action, subject, occurred_at)
+  values (gen_random_uuid()::text,
+    case when account is null then 'فصل حساب مشترك' else 'ربط حساب مشترك' end,
+    p_member_id::text, now());
 exception
   when no_data_found then raise exception 'Confirm the subscriber email in Supabase Auth first' using errcode = 'P0002';
   when too_many_rows then raise exception 'More than one Auth account has this address' using errcode = '22023';
