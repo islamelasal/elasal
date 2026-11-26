@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
     <meta name="referrer" content="no-referrer">
     <meta name="theme-color" content="#111011">
     <meta name="description" content="صور الكابتن محمد العسال من المواد التعريفية لأكاديمية العسال للملاكمة.">
     <title>معرض الصور | أكاديمية العسال للملاكمة</title>
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="./assets/base.css?v=2">
-    <link rel="stylesheet" href="./assets/site.css">
+    <link rel="stylesheet" href="./assets/site.css?v=3">
 </head>
 <body>
     <a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
@@ -40,17 +40,34 @@
                     <figcaption>الكابتن محمد العسال</figcaption>
                 </figure>
                 <figure class="photo-card">
-                    <a class="gallery-photo red-portrait" href="./assets/coach-training.webp" aria-label="افتح صورة الكابتن محمد العسال بملابس التدريب بالحجم الكامل">
-                        <img src="./assets/coach-training.webp" width="1200" height="800" alt="الكابتن محمد العسال بملابس التدريب الحمراء">
+                    <a class="gallery-photo red-portrait" href="./assets/coach-training.webp" aria-label="افتح صورة الكابتن محمد العسال بالحجم الكامل">
+                        <img src="./assets/coach-training.webp" width="1200" height="800" alt="الكابتن محمد العسال">
                     </a>
-                    <figcaption>الكابتن محمد العسال بملابس التدريب</figcaption>
+                    <figcaption>الكابتن محمد العسال</figcaption>
                 </figure>
             </div>
+            <dialog id="photo-viewer" class="photo-viewer" aria-labelledby="photo-description">
+                <div class="viewer-toolbar">
+                    <button class="gold-tool-btn" id="photo-back" type="button">← الرجوع للمعرض</button>
+                    <span id="photo-position" role="status"></span>
+                </div>
+                <img id="photo-full" alt="">
+                <div class="viewer-toolbar">
+                    <button class="gold-tool-btn" id="photo-prev" type="button">الصورة السابقة</button>
+                    <span id="photo-description"></span>
+                    <button class="gold-tool-btn" id="photo-next" type="button">الصورة التالية</button>
+                </div>
+            </dialog>
         </main>
         <footer class="public-footer">
             <span>أكاديمية العسال للملاكمة</span>
             <a href="./contact.html">مدينة نصر، القاهرة</a>
         </footer>
+        <nav class="quick-contact" aria-label="الحجز والاستفسار">
+            <a class="gold-tool-btn" href="https://wa.me/201004969332?text=%D9%85%D8%B1%D8%AD%D8%A8%D9%8B%D8%A7%D8%8C%20%D8%B9%D9%86%D8%AF%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%B5%D9%88%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D8%AF%D8%B1%D9%8A%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A3%D9%83%D8%A7%D8%AF%D9%8A%D9%85%D9%8A%D8%A9%D8%8C%20%D9%84%D9%88%20%D8%B3%D9%85%D8%AD%D8%AA." data-contact="whatsapp" data-inquiry="الصور والتدريب في الأكاديمية"><img class="contact-icon" src="./assets/whatsapp.svg" width="23" height="23" alt=""><span>واتساب</span></a>
+            <a class="gold-tool-btn" href="tel:+201004969332" data-contact="phone" aria-label="اتصال للاستفسار عن الصور والتدريب في الأكاديمية"><img class="contact-icon" src="./assets/phone.svg" width="23" height="23" alt=""><span>اتصال</span></a>
+        </nav>
     </div>
+    <script type="module" src="./gallery.js"></script>
 </body>
 </html>
