@@ -98,9 +98,13 @@ export async function readPublished() {
   } finally {
     clearTimeout(timer);
   }
+  return {content: await readStaticContent(), revision: null};
+}
+
+export async function readStaticContent() {
   const response = await fetch('./' + CONTENT_PATH, {cache: 'no-store'});
   if (!response.ok) throw Error('تعذر تحميل محتوى الموقع المنشور.');
-  return {content: validateContent(await response.json()), revision: null};
+  return validateContent(await response.json());
 }
 
 function openDraftDB() {

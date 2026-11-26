@@ -1,5 +1,13 @@
 import {db, unwrap} from './supabase-client.js';
-import {mediaKeys, validateContent} from './site-data.js';
+import {mediaKeys, readStaticContent, validateContent} from './site-data.js?v=2';
+
+export async function initializePublicContent() {
+  const table = db.from('site_content');
+  const existing = unwrap(await table.select('revision').eq('id', true).maybeSingle());
+  if (existing) return;
+  const result = await table.insert({id: true, content: await readStaticContent()});
+  if (result.error && result.error.code !== '23505') throw result.error;
+}
 
 export async function publishContent({revision, content: draft}) {
   const content = validateContent(draft, true);

@@ -1,4 +1,4 @@
-import './app.js?v=5';
+import './app.js?v=6';
 const actions = {
   a0: function(event) { event.preventDefault(); login() },
   a4: function(event) { viewLargeImage(this.querySelector('img').src) },

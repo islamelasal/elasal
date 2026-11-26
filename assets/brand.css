@@ -546,3 +546,9 @@ body[data-theme="green"] {
 .expense-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
 .expense-row span { flex: 1 1 130px; overflow-wrap: anywhere; }
 .expense-row button { min-height: 38px; font-size: .84rem; }
+.legacy-export { border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 15px; }
+.legacy-export summary { color: var(--primary); }
+.legacy-export form { display: grid; gap: 7px; padding-top: 10px; }
+.legacy-export label, #legacy-feedback { color: var(--text-muted); font-size: .9rem; }
+.legacy-export button { justify-self: start; }
+#legacy-feedback:empty { display: none; }

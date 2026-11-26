@@ -1,16 +1,18 @@
 import {emptyState, normalize, expired, expiryDate, subscriptionEnd, today, uid, piasters} from './model.js?v=4';
 import {db, unwrap, authFeedback} from './supabase-client.js';
 import {loadAcademy, saveAcademy, makeBackup, listAcademyBackups, loadBackup, linkAccount} from './academy-data.js';
-import {exportEncrypted, decryptBackup} from './legacy-backup.js';
+import {exportEncrypted, decryptBackup} from './legacy-backup.js?v=2';
+import {prepareLegacyExport} from './legacy-local.js';
 import {openReport} from './finance.js';
-import {openEditor} from './site-editor.js';
+import {openEditor} from './site-editor.js?v=2';
+import {initializePublicContent} from './site-publish.js?v=2';
 
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money = n => Number(n).toLocaleString('ar-EG', {maximumFractionDigits: 2}) + ' ج.م';
 const photo = value => value || './assets/avatar.svg';
 let state = emptyState(), revision = 0, unlocked = false, busy = false, email = '', currentFilter = 'all', activeQrMember = null;
-let lockTimer;
+let lockTimer, publicContentSetup;
 let backups = [], lastBackupError = '';
 const show = id => { $(id).style.display = 'flex'; };
 const close = id => { $(id).style.display = 'none'; };
@@ -32,6 +34,7 @@ function initApp() {
   changeTheme('black');
   $('entry-status').textContent = 'سجّل الدخول ببريد المدير';
   $('login-form').hidden = false;
+  prepareLegacyExport().catch(() => {});
 }
 async function signOut() {
   unlocked = false;
@@ -53,6 +56,9 @@ async function login() {
     unlocked = true;
     $('login-form').reset();
     enter();
+    publicContentSetup = initializePublicContent().catch(() => {
+      if (unlocked && !busy) status('تعذّر إعداد محتوى الموقع. افتح محرر المحتوى للمحاولة مرة أخرى.', true);
+    });
   } catch (error) {
     await signOut();
     $('entry-status').textContent = authFeedback(error);
@@ -424,7 +430,13 @@ async function listBackups() {
   for(let i=0;i<backups.length;i++) {
     const b=backups[i],row=document.createElement('div');row.className='backup-row';
     const title=document.createElement('p');title.textContent=({daily:'تلقائية',manual:'يدوية','before-restore':'قبل الاستعادة'}[b.kind]||b.kind)+' · مراجعة '+b.revision;
-    const time=document.createElement('time');time.textContent=new Intl.DateTimeFormat('ar-EG',{timeZone:'Africa/Cairo',dateStyle:'medium',timeStyle:'short',hour12:true}).format(b.created_at);row.append(title,time);
+    const time=document.createElement('time');
+    const created = new Date(b.created_at);
+    if (Number.isFinite(created.getTime())) {
+      time.dateTime = created.toISOString();
+      time.textContent = new Intl.DateTimeFormat('ar-EG',{timeZone:'Africa/Cairo',dateStyle:'medium',timeStyle:'short',hour12:true}).format(created);
+    }
+    row.append(title,time);
     for(const [action,label] of [['download','تنزيل'],['restore','استعادة']]){const button=document.createElement('button');button.className='gold-tool-btn';button.textContent=label;button.dataset.backupAction=action;button.dataset.index=i;row.append(button);}
     list.append(row);
   }
@@ -434,7 +446,10 @@ async function createBackup() {
 }
 document.addEventListener('click',async event=>{
   if (unlocked && event.target.closest('[data-report]')) openReport(() => state);
-  if (unlocked && event.target.closest('[data-content-editor]')) openEditor();
+  if (unlocked && event.target.closest('[data-content-editor]')) {
+    await publicContentSetup;
+    if (unlocked) openEditor();
+  }
   if (event.target.closest('[data-password]')) {
     $('password-feedback').textContent = '';
     $('password-dialog').showModal();

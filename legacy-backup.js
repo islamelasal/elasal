@@ -51,3 +51,17 @@ export async function decryptBackup(backup, readPassword) {
     throw Error('تعذر فتح النسخة. تحقّق من كلمة مرور النسخة وسلامة الملف.');
   }
 }
+
+export async function openPreviousVault(record, password) {
+  try {
+    const key = await derive(password, record.salt);
+    const context = encoder.encode('state:' + record.generation + ':' + record.revision);
+    const bytes = await crypto.subtle.decrypt(
+      {name: 'AES-GCM', iv: record.sealed.iv, additionalData: context},
+      key, record.sealed.ciphertext
+    );
+    return JSON.parse(decoder.decode(bytes));
+  } catch {
+    throw Error('تعذّر فتح البيانات القديمة. جرّب كلمة المرور اللي كنت بتستخدمها على هذا الجهاز.');
+  }
+}

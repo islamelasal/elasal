@@ -1,5 +1,5 @@
-import {mediaKeys, photoSource, readDraft, readPublished, saveDraft, validateContent} from './site-data.js';
-import {publishContent} from './site-publish.js';
+import {mediaKeys, photoSource, readDraft, readPublished, saveDraft, validateContent} from './site-data.js?v=2';
+import {publishContent} from './site-publish.js?v=2';
 
 const $ = id => document.getElementById(id);
 const dialog = $('site-editor');

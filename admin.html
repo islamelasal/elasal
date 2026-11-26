@@ -10,7 +10,7 @@
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
     <title>لوحة الإدارة | أكاديمية العسال للملاكمة</title>
     <link rel="stylesheet" href="./assets/base.css?v=2">
-    <link rel="stylesheet" href="./assets/brand.css?v=6">
+    <link rel="stylesheet" href="./assets/brand.css?v=7">
 </head>
 <body>
     <main id="entry-screen" class="site-shell">
@@ -23,7 +23,7 @@
         <div class="entry-hero">
             <div class="entry-content">
                 <p id="entry-status" role="status">جارٍ فحص الاتصال</p>
-                <h1>أكاديمية العسال <span>للملاكمة</span></h1>
+                <h1>دخول <span>الإدارة</span></h1>
                 <p class="entry-description">لوحة إدارة المشتركين والحصص والمقبوضات.</p>
                 <form id="login-form" hidden data-onsubmit="a0">
                     <div class="form-gold-group"><label for="admin-email">البريد الإلكتروني</label><input id="admin-email" type="email" dir="ltr" autocomplete="username" required maxlength="254"></div>
@@ -32,6 +32,15 @@
                     <button id="unlock-submit" class="modal-submit-gold" type="submit">دخول الإدارة</button>
                 </form>
                 <p class="muted"><a href="./member.html">دخول المشتركين</a></p>
+                <details id="legacy-export" class="legacy-export" hidden>
+                    <summary>نقل بيانات قديمة من هذا الجهاز</summary>
+                    <form id="legacy-export-form">
+                        <label id="legacy-password-label" for="legacy-password">كلمة مرور النسخة</label>
+                        <input id="legacy-password" type="password" maxlength="256" required>
+                        <button class="gold-tool-btn" type="submit">تنزيل نسخة للنقل</button>
+                        <p id="legacy-feedback" role="status"></p>
+                    </form>
+                </details>
             </div>
             <figure class="entry-portrait">
                 <img src="./assets/coach.webp" width="1200" height="900" alt="" fetchpriority="high">
@@ -401,6 +410,6 @@
 
 <script src="./assets/vendor/supabase-js-2.119.2.js" defer></script>
 <script src="./assets/qrcode.min.js" defer></script>
-<script type="module" src="./events.js?v=5"></script>
+<script type="module" src="./events.js?v=6"></script>
 </body>
 </html>

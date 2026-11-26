@@ -1,4 +1,4 @@
-import {readDraft, readPublished, validateContent, photoSource, whatsappLink} from './site-data.js';
+import {readDraft, readPublished, validateContent, photoSource, whatsappLink} from './site-data.js?v=2';
 
 function element(tag, options = {}) {
   const node = document.createElement(tag);
